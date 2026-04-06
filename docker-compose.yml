@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # ─────────────────────────────────────────────
+  # PostgreSQL Database
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: hhp_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hhp_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: hhp_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"   # Remove this in production (only expose internally)
+    networks:
+      - hhp_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hhp_user -d hhp_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────
+  # Next.js Application
+  # ─────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hhp_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://hhp_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/hhp_db
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-https://hhp.kevinhamilton.ca}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-Hicks Hockey Pool}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://hhp.kevinhamilton.ca}
+      TZ: America/Toronto
+    ports:
+      - "3000:3000"
+    networks:
+      - hhp_network
+
+  # ─────────────────────────────────────────────
+  # Cron Job Runner (scheduled emails & auto-picks)
+  # Runs as a separate lightweight service
+  # ─────────────────────────────────────────────
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile.cron
+    container_name: hhp_cron
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      app:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql://hhp_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/hhp_db
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-Hicks Hockey Pool}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://hhp.kevinhamilton.ca}
+      TZ: America/Toronto
+    networks:
+      - hhp_network
+
+networks:
+  hhp_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

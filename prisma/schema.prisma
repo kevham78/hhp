@@ -1,0 +1,415 @@
+// Prisma Schema for Hicks Hockey Pool (HHP)
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// AUTH & USERS
+// ─────────────────────────────────────────────
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String    @unique
+  emailVerified     DateTime?
+  image             String?
+  password          String?   // hashed, null if Google login
+  role              Role      @default(PLAYER)
+  isActive          Boolean   @default(true)
+  notifyByEmail     Boolean   @default(true)
+  notifyInApp       Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  picks             Pick[]
+  suicidePicks      SuicidePick[]
+  payments          Payment[]        @relation("PlayerPayments")
+  winnings          Payment[]        @relation("PlayerWinnings")
+  notifications     Notification[]
+  seasonStats       SeasonStat[]
+  weeklyStats       WeeklyStat[]
+  suicideStatus     SuicideStatus[]
+  inviteTokens      InviteToken[]
+
+  @@map("users")
+}
+
+enum Role {
+  PLAYER
+  ADMIN
+}
+
+// NextAuth required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model InviteToken {
+  id        String    @id @default(cuid())
+  token     String    @unique @default(cuid())
+  email     String
+  createdBy String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User      @relation(fields: [createdBy], references: [id])
+
+  @@map("invite_tokens")
+}
+
+// ─────────────────────────────────────────────
+// SEASONS
+// ─────────────────────────────────────────────
+
+model Season {
+  id          String    @id @default(cuid())
+  name        String    // e.g. "2025-26"
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  weeks       Week[]
+  seasonStats SeasonStat[]
+  suicideStatus SuicideStatus[]
+  pastWinner  PastSeasonWinner?
+
+  @@map("seasons")
+}
+
+model PastSeasonWinner {
+  id        String   @id @default(cuid())
+  seasonId  String   @unique
+  winnerName String
+  points    Int
+  season    Season   @relation(fields: [seasonId], references: [id])
+
+  @@map("past_season_winners")
+}
+
+// ─────────────────────────────────────────────
+// WEEKS & GAMES
+// ─────────────────────────────────────────────
+
+model Week {
+  id              String      @id @default(cuid())
+  seasonId        String
+  weekNumber      Int
+  saturdayDate    DateTime
+  sundayDate      DateTime
+  picksDeadline   DateTime    // Friday 2pm EST by default
+  status          WeekStatus  @default(UPCOMING)
+  isSkipped       Boolean     @default(false) // no games this week
+  picksPublished  Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+
+  // Relations
+  season          Season      @relation(fields: [seasonId], references: [id])
+  games           Game[]
+  picks           Pick[]
+  weeklyStats     WeeklyStat[]
+  payments        Payment[]
+
+  @@unique([seasonId, weekNumber])
+  @@map("weeks")
+}
+
+enum WeekStatus {
+  UPCOMING
+  OPEN        // picks can be made
+  LOCKED      // past deadline, awaiting results
+  COMPLETED   // results entered
+}
+
+model Game {
+  id            String     @id @default(cuid())
+  weekId        String
+  nhlGameId     String     // ID from NHL API
+  homeTeam      String
+  awayTeam      String
+  homeTeamCode  String     // e.g. "BOS"
+  awayTeamCode  String     // e.g. "TOR"
+  gameTime      DateTime
+  gameDay       GameDay
+  homeScore     Int?       // null until game played
+  awayScore     Int?
+  winner        String?    // team code of winner, null until played
+  status        GameStatus @default(SCHEDULED)
+
+  // Relations
+  week          Week       @relation(fields: [weekId], references: [id])
+  picks         Pick[]
+
+  @@map("games")
+}
+
+enum GameDay {
+  SATURDAY
+  SUNDAY
+}
+
+enum GameStatus {
+  SCHEDULED
+  IN_PROGRESS
+  FINAL
+  POSTPONED
+}
+
+// ─────────────────────────────────────────────
+// PICKS
+// ─────────────────────────────────────────────
+
+model Pick {
+  id            String      @id @default(cuid())
+  userId        String
+  weekId        String
+  gameId        String
+  pickedTeam    String      // team code
+  isCorrect     Boolean?    // null until game result known
+  isAutoPickd   Boolean     @default(false)
+  isDraft       Boolean     @default(true)
+  submittedAt   DateTime?   // null if still draft
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Tiebreaker
+  tiebreakerRank Int?       // 1, 2, or 3 — null if not a tiebreaker
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id])
+  week          Week        @relation(fields: [weekId], references: [id])
+  game          Game        @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, weekId, gameId])
+  @@map("picks")
+}
+
+// ─────────────────────────────────────────────
+// SUICIDE POOLS
+// ─────────────────────────────────────────────
+
+model SuicideStatus {
+  id                    String   @id @default(cuid())
+  userId                String
+  seasonId              String
+  winnerPoolEliminated  Boolean  @default(false)
+  winnerPoolStrikes     Int      @default(0) // 0, 1, or 2
+  loserPoolEliminated   Boolean  @default(false)
+  loserPoolStrikes      Int      @default(0)
+
+  // Track which teams already picked (no repeats)
+  winnerTeamsUsed       String[] // array of team codes
+  loserTeamsUsed        String[]
+
+  user                  User     @relation(fields: [userId], references: [id])
+  season                Season   @relation(fields: [seasonId], references: [id])
+
+  @@unique([userId, seasonId])
+  @@map("suicide_status")
+}
+
+model SuicidePick {
+  id            String        @id @default(cuid())
+  userId        String
+  weekId        String
+  poolType      SuicidePool
+  pickedTeam    String        // team code
+  isCorrect     Boolean?      // null until result known
+  isAutoPicked  Boolean       @default(false)
+  isDraft       Boolean       @default(true)
+  submittedAt   DateTime?
+  createdAt     DateTime      @default(now())
+
+  user          User          @relation(fields: [userId], references: [id])
+
+  @@unique([userId, weekId, poolType])
+  @@map("suicide_picks")
+}
+
+enum SuicidePool {
+  WINNER
+  LOSER
+}
+
+model SuicidePoolState {
+  id            String      @id @default(cuid())
+  poolType      SuicidePool
+  seasonId      String
+  weekId        String?     // week it was last won/reset
+  currentPot    Float       @default(0)
+  isActive      Boolean     @default(true) // false if no one left
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([poolType, seasonId])
+  @@map("suicide_pool_state")
+}
+
+// ─────────────────────────────────────────────
+// STATS & STANDINGS
+// ─────────────────────────────────────────────
+
+model WeeklyStat {
+  id            String   @id @default(cuid())
+  userId        String
+  weekId        String
+  seasonId      String
+  points        Int      @default(0)
+  totalPicks    Int      @default(0)
+  correctPicks  Int      @default(0)
+  isWinner      Boolean  @default(false)
+  isTied        Boolean  @default(false)
+  tiebreakerWon Boolean  @default(false)
+
+  user          User     @relation(fields: [userId], references: [id])
+  week          Week     @relation(fields: [weekId], references: [id])
+
+  @@unique([userId, weekId])
+  @@map("weekly_stats")
+}
+
+model SeasonStat {
+  id              String   @id @default(cuid())
+  userId          String
+  seasonId        String
+  totalPoints     Int      @default(0)
+  weeklyWins      Int      @default(0)
+  monthlyWins     Int      @default(0)
+  currentMonth    Int?     // 1-12
+  monthlyPoints   Int      @default(0) // resets each month
+
+  user            User     @relation(fields: [userId], references: [id])
+  season          Season   @relation(fields: [seasonId], references: [id])
+
+  @@unique([userId, seasonId])
+  @@map("season_stats")
+}
+
+// ─────────────────────────────────────────────
+// PAYMENTS & FINANCIALS
+// ─────────────────────────────────────────────
+
+model Payment {
+  id            String        @id @default(cuid())
+  playerId      String
+  weekId        String?       // null for monthly payments
+  type          PaymentType
+  amount        Float
+  description   String
+  createdAt     DateTime      @default(now())
+  createdBy     String        // admin userId who created it
+
+  // For winnings — who received it
+  recipientId   String?
+  recipient     User?         @relation("PlayerWinnings", fields: [recipientId], references: [id])
+  player        User          @relation("PlayerPayments", fields: [playerId], references: [id])
+  week          Week?         @relation(fields: [weekId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentType {
+  DUES_PAID         // player paid commissioner
+  WEEKLY_WINNING    // weekly prize paid out
+  MONTHLY_WINNING   // monthly prize paid out
+  SUICIDE_WINNING   // suicide pool prize paid out
+}
+
+// ─────────────────────────────────────────────
+// SETTINGS
+// ─────────────────────────────────────────────
+
+model Settings {
+  id                      String   @id @default(cuid())
+  weeklyDues              Float    @default(5.00)
+  weeklyPrize             Float    @default(30.00)
+  monthlyPrize            Float    @default(5.00)
+  suicideWinnerPrize      Float    @default(5.00)
+  suicideLoserPrize       Float    @default(5.00)
+
+  // Email schedule (day + time in EST)
+  resultsEmailDay         String   @default("Monday")
+  resultsEmailTime        String   @default("09:00")
+  reminderOneDay          String   @default("Thursday")
+  reminderOneTime         String   @default("15:00")
+  reminderTwoDay          String   @default("Friday")
+  reminderTwoTime         String   @default("08:00")
+  picksRevealDay          String   @default("Friday")
+  picksRevealTime         String   @default("14:00")
+
+  updatedAt               DateTime @updatedAt
+  updatedBy               String?
+
+  @@map("settings")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  PICKS_REMINDER
+  PICKS_PUBLISHED
+  WEEK_RESULTS
+  PAYMENT_LOGGED
+  GENERAL
+}
