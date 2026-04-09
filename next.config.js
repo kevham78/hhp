@@ -1,20 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // Required for Docker deployment
+  output: 'standalone',
+  serverExternalPackages: ['@prisma/client', 'bcryptjs'],
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'assets.nhle.com', // NHL team logos
+        hostname: 'assets.nhle.com',
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com', // Google profile images
+        hostname: 'lh3.googleusercontent.com',
       },
     ],
-  },
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },
 }
 

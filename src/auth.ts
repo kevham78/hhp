@@ -26,26 +26,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     Credentials({
       async authorize(credentials) {
-        const parsed = signInSchema.safeParse(credentials)
-        if (!parsed.success) return null
+  
+  const parsed = signInSchema.safeParse(credentials)
+  if (!parsed.success) return null
 
-        const { email, password } = parsed.data
+  const { email, password } = parsed.data
 
-        const user = await prisma.user.findUnique({ where: { email } })
-        if (!user || !user.password) return null
-        if (!user.isActive) return null
+  const user = await prisma.user.findUnique({ where: { email } })
 
-        const passwordMatch = await bcrypt.compare(password, user.password)
-        if (!passwordMatch) return null
+  if (!user || !user.password) return null
+  if (!user.isActive) return null
 
-        return {
-          id:    user.id,
-          email: user.email,
-          name:  user.name,
-          role:  user.role,
-          image: user.image,
-        }
-      },
+  const passwordMatch = await bcrypt.compare(password, user.password)
+  
+  if (!passwordMatch) return null
+
+  return {
+    id:    user.id,
+    email: user.email,
+    name:  user.name,
+    role:  user.role,
+    image: user.image,
+  }
+},
     }),
   ],
   callbacks: {

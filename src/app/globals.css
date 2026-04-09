@@ -3,111 +3,62 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* HHP Dark Theme (default) */
-    --background:   222 47% 11%;   /* hhp-navy */
-    --foreground:   0 0% 100%;
-
-    --card:         222 47% 15%;
-    --card-foreground: 0 0% 100%;
-
-    --primary:      350 85% 47%;   /* hhp-red */
-    --primary-foreground: 0 0% 100%;
-
-    --secondary:    222 47% 20%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted:        222 47% 18%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent:       40 62% 55%;    /* hhp-gold */
-    --accent-foreground: 222 47% 11%;
-
-    --destructive:  0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border:       222 47% 22%;
-    --input:        222 47% 18%;
-    --ring:         40 62% 55%;
-
-    --radius: 0.5rem;
-  }
-}
-
-@layer base {
   * {
-    @apply border-border;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: #0a1628;
+    color: white;
   }
 
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-hhp-navy;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-hhp-navy-light rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-hhp-gold-dark;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0a1628; }
+  ::-webkit-scrollbar-thumb { background: #1a3a6b; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b8892a; }
 }
 
 @layer components {
-  /* HHP Card */
   .hhp-card {
     @apply bg-hhp-navy-mid border border-hhp-navy-light rounded-xl p-4;
   }
 
-  /* Gold accent border */
   .hhp-gold-border {
     @apply border border-hhp-gold/30;
   }
 
-  /* Team badge */
-  .team-badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md
-           bg-hhp-navy-light text-sm font-semibold tracking-wide;
+  .pick-btn {
+    @apply flex-1 py-2 px-3 rounded-lg border-2 text-sm font-semibold transition-all duration-150 cursor-pointer;
   }
 
-  /* Pick button states */
-  .pick-btn {
-    @apply flex-1 py-2 px-3 rounded-lg border-2 text-sm font-semibold
-           transition-all duration-150 cursor-pointer;
-  }
   .pick-btn-unselected {
-    @apply border-hhp-navy-light bg-hhp-navy text-white/70
-           hover:border-hhp-gold/50 hover:text-white;
+    @apply border-hhp-navy-light bg-hhp-navy text-white/70 hover:border-hhp-gold/50 hover:text-white;
   }
+
   .pick-btn-selected {
     @apply border-hhp-gold bg-hhp-gold/10 text-hhp-gold;
   }
+
   .pick-btn-correct {
     @apply border-green-500 bg-green-500/10 text-green-400;
   }
+
   .pick-btn-incorrect {
     @apply border-red-500 bg-red-500/10 text-red-400;
   }
 
-  /* Tiebreaker badge */
   .tiebreaker-badge {
-    @apply inline-flex items-center justify-center w-5 h-5 rounded-full
-           bg-hhp-gold text-hhp-navy text-xs font-black;
+    @apply inline-flex items-center justify-center w-5 h-5 rounded-full bg-hhp-gold text-hhp-navy text-xs font-black;
   }
 
-  /* Status pill */
   .status-pill {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
   }
-  .status-pill-green  { @apply bg-green-500/15 text-green-400; }
-  .status-pill-gold   { @apply bg-hhp-gold/15 text-hhp-gold; }
-  .status-pill-red    { @apply bg-hhp-red/15 text-hhp-red; }
-  .status-pill-muted  { @apply bg-white/10 text-white/50; }
+
+  .status-pill-green { @apply bg-green-500/15 text-green-400; }
+  .status-pill-gold  { @apply bg-yellow-500/15 text-yellow-400; }
+  .status-pill-red   { @apply bg-red-500/15 text-red-400; }
+  .status-pill-muted { @apply bg-white/10 text-white/50; }
 }
