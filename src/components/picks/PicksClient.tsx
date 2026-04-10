@@ -173,6 +173,23 @@ function handleSuicide(type: 'winner' | 'loser', gameId: string) {
   }))
 }
 
+// ── Random picks (DEV ONLY) ────────────────
+function handleRandomPicks() {
+  const newPicks: Record<string, string> = {}
+
+  for (const game of allGames) {
+    const gameId   = String(game.id)
+    const useHome  = Math.random() > 0.5
+    newPicks[gameId] = useHome ? game.homeTeam.abbrev : game.awayTeam.abbrev
+  }
+
+  setState({
+    picks:       newPicks,
+    tiebreakers: {},
+    suicide:     { winner: null, loser: null },
+  })
+}
+
   // ── Save draft ─────────────────────────────
   async function handleSaveDraft() {
     setSaving(true)
@@ -260,7 +277,17 @@ function handleSuicide(type: 'winner' | 'loser', gameId: string) {
         subtitle="Select the winner for every game this weekend"
         complete={allPicked}
       />
-
+{/* DEV ONLY: Random picks button */}
+{process.env.NODE_ENV === 'development' && isOpen && (
+  <button
+    onClick={handleRandomPicks}
+    className="w-full py-2 rounded-lg border border-dashed border-yellow-500/40
+               text-yellow-500/70 text-xs font-mono hover:border-yellow-500/70
+               hover:text-yellow-500 transition-colors"
+  >
+    🎲 Random Picks (Dev Only)
+  </button>
+)}
       {/* Saturday */}
 <div className="hhp-card space-y-0">
   <h2 className="text-hhp-gold font-bold text-xs uppercase tracking-widest mb-3">

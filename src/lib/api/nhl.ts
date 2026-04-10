@@ -67,19 +67,23 @@ export function formatDate(date: Date): string {
 // ─────────────────────────────────────────────
 
 export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
+  // In development, hardcode a known good weekend with NHL games
+  if (process.env.NODE_ENV === 'development') {
+    return {
+      saturday: new Date('2026-04-11T12:00:00Z'),
+      sunday:   new Date('2026-04-12T12:00:00Z'),
+    }
+  }
+
   const now       = new Date()
-  const dayOfWeek = now.getDay() // 0=Sun, 1=Mon, ..., 5=Fri, 6=Sat
+  const dayOfWeek = now.getDay()
 
   let daysUntilSat: number
-
   if (dayOfWeek === 6) {
-    // Today is Saturday
     daysUntilSat = 0
   } else if (dayOfWeek === 0) {
-    // Today is Sunday — show this weekend still
     daysUntilSat = -1
   } else {
-    // Mon–Fri — find next Saturday
     daysUntilSat = 6 - dayOfWeek
   }
 

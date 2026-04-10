@@ -94,10 +94,6 @@ const picksState: PicksState = {
     })(),
   },
 }
-console.log('=== PICKS DEBUG ===')
-console.log('Week games:', weekData.games.map(g => ({ id: g.id, nhlGameId: g.nhlGameId, home: g.homeTeamCode, away: g.awayTeamCode })))
-console.log('Existing picks:', existingPicks.map(p => ({ gameId: p.gameId, team: p.pickedTeam, rank: p.tiebreakerRank })))
-console.log('Existing suicide:', existingSuicide)
 
 
   const { saturday: satDate, sunday: sunDate } = getUpcomingWeekend()
