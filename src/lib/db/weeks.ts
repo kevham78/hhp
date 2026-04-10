@@ -48,12 +48,13 @@ export async function getOrCreateCurrentWeek() {
   const { saturday: satGames, sunday: sunGames } = await getWeekendGames()
 
   for (const game of satGames) {
+  try {
     await prisma.game.create({
       data: {
         weekId:       week.id,
         nhlGameId:    String(game.id),
-        homeTeam:     game.homeTeam.name.default,
-        awayTeam:     game.awayTeam.name.default,
+        homeTeam:     game.homeTeam.abbrev,
+        awayTeam:     game.awayTeam.abbrev,
         homeTeamCode: game.homeTeam.abbrev,
         awayTeamCode: game.awayTeam.abbrev,
         gameTime:     new Date(game.startTimeUTC),
@@ -61,15 +62,19 @@ export async function getOrCreateCurrentWeek() {
         status:       'SCHEDULED',
       },
     })
+  } catch (err) {
   }
+}
+
 
   for (const game of sunGames) {
+  try {
     await prisma.game.create({
       data: {
         weekId:       week.id,
         nhlGameId:    String(game.id),
-        homeTeam:     game.homeTeam.name.default,
-        awayTeam:     game.awayTeam.name.default,
+        homeTeam:     game.homeTeam.abbrev,
+        awayTeam:     game.awayTeam.abbrev,
         homeTeamCode: game.homeTeam.abbrev,
         awayTeamCode: game.awayTeam.abbrev,
         gameTime:     new Date(game.startTimeUTC),
@@ -77,7 +82,10 @@ export async function getOrCreateCurrentWeek() {
         status:       'SCHEDULED',
       },
     })
+  } catch (err) {
+    
   }
+}
 
   return prisma.week.findUnique({
     where:   { id: week.id },

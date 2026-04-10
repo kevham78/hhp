@@ -52,24 +52,58 @@ export default async function PicksPage() {
     }),
   ])
 
-  // Shape existing picks into PicksState
-  const picksState: PicksState = {
-    picks: Object.fromEntries(
-      existingPicks.map(p => [p.gameId, p.pickedTeam])
-    ),
-    tiebreakers: Object.fromEntries(
-      existingPicks
-        .filter(p => p.tiebreakerRank)
-        .map(p => [p.gameId, p.tiebreakerRank!])
-    ),
-    suicide: {
-      winner: existingSuicide.find(s => s.poolType === 'WINNER')?.pickedTeam ?? null,
-      loser:  existingSuicide.find(s => s.poolType === 'LOSER')?.pickedTeam  ?? null,
-    },
-  }
+ // Shape existing picks into PicksState
+// We need to map DB gameId back to NHL gameId for the UI
+const picksState: PicksState = {
+  picks: Object.fromEntries(
+    existingPicks
+    
+      .map(p => {
+        const game = weekData.games.find(g => g.id === p.gameId)
+        return game ? [game.nhlGameId, p.pickedTeam] : null
+      })
+      .filter(Boolean) as [string, string][]
+  ),
+  tiebreakers: Object.fromEntries(
+    existingPicks
+      .filter(p => p.tiebreakerRank)
+      .map(p => {
+        const game = weekData.games.find(g => g.id === p.gameId)
+        return game ? [game.nhlGameId, p.tiebreakerRank!] : null
+      })
+      .filter(Boolean) as [string, number][]
+  ),
+  suicide: {
+    winner: (() => {
+      const wp = existingSuicide.find(s => s.poolType === 'WINNER')
+      if (!wp) return null
+      // Find the NHL game ID where this team was picked
+      const game = weekData.games.find(g =>
+        g.homeTeamCode === wp.pickedTeam || g.awayTeamCode === wp.pickedTeam
+      )
+      return game ? game.nhlGameId : null
+    })(),
+    loser: (() => {
+      const lp = existingSuicide.find(s => s.poolType === 'LOSER')
+      if (!lp) return null
+      // For loser, the stored team is the losing team — find its game
+      const game = weekData.games.find(g =>
+        g.homeTeamCode === lp.pickedTeam || g.awayTeamCode === lp.pickedTeam
+      )
+      return game ? game.nhlGameId : null
+    })(),
+  },
+}
+console.log('=== PICKS DEBUG ===')
+console.log('Week games:', weekData.games.map(g => ({ id: g.id, nhlGameId: g.nhlGameId, home: g.homeTeamCode, away: g.awayTeamCode })))
+console.log('Existing picks:', existingPicks.map(p => ({ gameId: p.gameId, team: p.pickedTeam, rank: p.tiebreakerRank })))
+console.log('Existing suicide:', existingSuicide)
+
 
   const { saturday: satDate, sunday: sunDate } = getUpcomingWeekend()
-  const isOpen = new Date() < new Date(weekData.picksDeadline)
+  const isOpen = process.env.NODE_ENV === 'development' 
+  ? true 
+  : new Date() < new Date(weekData.picksDeadline)
 
   return (
     <PicksClient
