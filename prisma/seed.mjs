@@ -1,15 +1,12 @@
 import { PrismaClient } from '@prisma/client'
-import { createHash } from 'crypto'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-// Simple hash without bcrypt for now
-function hashPassword(password) {
-  return createHash('sha256').update(password).digest('hex')
-}
-
 async function main() {
   console.log('🌱 Seeding HHP database...')
+
+  const adminPassword = await bcrypt.hash('ChangeMe123!', 12)
 
   const wayne = await prisma.user.upsert({
     where:  { email: 'waynehicks2000@yahoo.com' },
@@ -17,7 +14,7 @@ async function main() {
     create: {
       email:    'waynehicks2000@yahoo.com',
       name:     'Wayne',
-      password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HS.iK8i',
+      password: adminPassword,
       role:     'ADMIN',
       isActive: true,
       notifyByEmail: true,
@@ -32,7 +29,7 @@ async function main() {
     create: {
       email:    'kevyham@gmail.com',
       name:     'Kevin',
-      password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HS.iK8i',
+      password: adminPassword,
       role:     'ADMIN',
       isActive: true,
       notifyByEmail: true,
@@ -100,6 +97,7 @@ async function main() {
     update: {},
     create: { poolType: 'WINNER', seasonId: season.id, currentPot: 0, isActive: true },
   })
+
   await prisma.suicidePoolState.upsert({
     where:  { poolType_seasonId: { poolType: 'LOSER', seasonId: season.id } },
     update: {},
