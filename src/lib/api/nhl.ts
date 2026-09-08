@@ -213,3 +213,58 @@ export function getGameLabel(game: NHLGameFromAPI, pickedTeam: string): string {
 
   return `${day} ${isHome ? 'vs' : '@'} ${opponent}`
 }
+
+// ─────────────────────────────────────────────
+// Fetch final scores for a specific date
+// ─────────────────────────────────────────────
+
+export type NHLGameResult = {
+  nhlGameId:    string
+  homeTeamCode: string
+  awayTeamCode: string
+  homeScore:    number
+  awayScore:    number
+  gameState:    string  // 'OFF' = final, 'LIVE', 'FUT'
+  isLive:       boolean
+  isFinal:      boolean
+}
+
+async function getResultsForDate(date: Date): Promise<NHLGameResult[]> {
+  const dateStr = formatDate(date)
+  try {
+    const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
+      cache: 'no-store', // always fresh for results
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+
+    const dayEntry = data.gameWeek?.find((day: any) => day.date === dateStr)
+    if (!dayEntry) return []
+
+    return (dayEntry.games || [])
+      .filter((g: any) => g.gameType === 2)
+      .map((g: any) => ({
+        nhlGameId:    String(g.id),
+        homeTeamCode: g.homeTeam.abbrev,
+        awayTeamCode: g.awayTeam.abbrev,
+        homeScore:    g.homeTeam.score ?? 0,
+        awayScore:    g.awayTeam.score ?? 0,
+        gameState:    g.gameState,
+        isLive:       g.gameState === 'LIVE',
+        isFinal:      g.gameState === 'OFF',
+      }))
+  } catch {
+    return []
+  }
+}
+
+export async function getWeekendResults(
+  saturdayDate: Date,
+  sundayDate:   Date
+): Promise<NHLGameResult[]> {
+  const [satResults, sunResults] = await Promise.all([
+    getResultsForDate(saturdayDate),
+    getResultsForDate(sundayDate),
+  ])
+  return [...satResults, ...sunResults]
+}
