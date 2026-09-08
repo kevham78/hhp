@@ -102,12 +102,13 @@ export async function POST(req: Request) {
     }
 
     // Check deadline — can't submit after Friday 2pm
-    if (!isDraft && isPastDeadline(week)) {
-      return NextResponse.json(
-        { error: 'Picks deadline has passed' },
-        { status: 400 }
-      )
-    }
+// In development, always allow submission for testing
+if (!isDraft && isPastDeadline(week) && process.env.NODE_ENV !== 'development') {
+  return NextResponse.json(
+    { error: 'Picks deadline has passed' },
+    { status: 400 }
+  )
+}
 
     const userId      = session.user.id
     const submittedAt = isDraft ? null : new Date()
