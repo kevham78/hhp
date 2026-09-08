@@ -53,12 +53,18 @@ function TeamStats({ team, isHome }: { team: TeamStandingInfo; isHome: boolean }
       </div>
 
       {/* Record */}
-      <div className="mb-3">
-        <p className="text-hhp-gold font-black text-xl">
-          {team.wins}-{team.losses}-{team.otLosses}
-        </p>
-        <p className="text-white/40 text-xs">{team.points} pts · {team.gamesPlayed} GP</p>
-      </div>
+<div className="mb-3">
+  {team.gamesPlayed === 0 ? (
+    <p className="text-white/40 text-sm">Season not started</p>
+  ) : (
+    <>
+      <p className="text-hhp-gold font-black text-xl">
+        {team.wins}-{team.losses}-{team.otLosses}
+      </p>
+      <p className="text-white/40 text-xs">{team.points} pts · {team.gamesPlayed} GP</p>
+    </>
+  )}
+</div>
 
       {/* Conference + Division rank */}
       <div className="space-y-1 mb-3">

@@ -62,16 +62,16 @@ async function main() {
   console.log('✅ Settings created')
 
   const season = await prisma.season.upsert({
-    where:  { id: 'season-2025-26' },
-    update: {},
-    create: {
-      id:        'season-2025-26',
-      name:      '2025-26',
-      startDate: new Date('2025-10-07T00:00:00.000Z'),
-      endDate:   new Date('2026-04-18T23:59:59.000Z'),
-      isActive:  false,
-    },
-  })
+  where:  { id: 'season-2026-27' },
+  update: {},
+  create: {
+    id:        'season-2026-27',
+    name:      '2026-27',
+    startDate: new Date('2026-09-29T00:00:00.000Z'),
+    endDate:   new Date('2027-04-10T23:59:59.000Z'),
+    isActive:  false,
+  },
+})
   console.log(`✅ Season created: ${season.name}`)
 
   for (const user of [wayne, kevin]) {

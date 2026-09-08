@@ -69,11 +69,11 @@ export function formatDate(date: Date): string {
 export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
   // In development, hardcode a known good weekend with NHL games
   if (process.env.NODE_ENV === 'development') {
-    return {
-      saturday: new Date('2026-04-11T12:00:00Z'),
-      sunday:   new Date('2026-04-12T12:00:00Z'),
-    }
+  return {
+    saturday: new Date('2026-10-03T12:00:00Z'),
+    sunday:   new Date('2026-10-04T12:00:00Z'),
   }
+}
 
   const now       = new Date()
   const dayOfWeek = now.getDay()

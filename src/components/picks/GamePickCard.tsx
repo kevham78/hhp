@@ -7,10 +7,11 @@ interface GamePickCardProps {
   game:         NHLGameFromAPI
   selectedTeam: string | null
   onPick:       (gameId: string, teamCode: string) => void
+  onInfo:       (homeCode: string, awayCode: string) => void
   isLocked:     boolean
 }
 
-export default function GamePickCard({ game, selectedTeam, onPick, isLocked }: GamePickCardProps) {
+export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLocked }: GamePickCardProps) {
   const gameId   = String(game.id)
   const awayCode = game.awayTeam.abbrev
   const homeCode = game.homeTeam.abbrev
@@ -71,6 +72,17 @@ export default function GamePickCard({ game, selectedTeam, onPick, isLocked }: G
           onError={e => (e.currentTarget.style.display = 'none')}
         />
         <span className="truncate">{homeCode}</span>
+      </button>
+
+      {/* Info button */}
+      <button
+        onClick={() => onInfo(homeCode, awayCode)}
+        className="flex-shrink-0 w-7 h-7 rounded-full border border-hhp-navy-light
+                   text-white hover:text-hhp-gold hover:border-hhp-gold/40
+                   flex items-center justify-center text-xs transition-colors"
+        title="View matchup stats"
+      >
+        ⓘ
       </button>
 
     </div>

@@ -143,7 +143,30 @@ export async function getGameStats(
   const homeTeam = extractTeamStanding(standings, homeCode)
   const awayTeam = extractTeamStanding(standings, awayCode)
 
-  if (!homeTeam || !awayTeam) return null
+  // If no standings yet, return placeholder data
+  if (!homeTeam || !awayTeam) {
+    const placeholder = (code: string): TeamStandingInfo => ({
+      teamCode:       code,
+      teamName:       code,
+      conferenceName: 'TBD',
+      conferenceRank: 0,
+      divisionName:   'TBD',
+      divisionRank:   0,
+      wins:           0,
+      losses:         0,
+      otLosses:       0,
+      points:         0,
+      gamesPlayed:    0,
+      last10:         '0-0-0',
+      streak:         '-',
+    })
+
+    return {
+      homeTeam:   placeholder(homeCode),
+      awayTeam:   placeholder(awayCode),
+      headToHead,
+    }
+  }
 
   return { homeTeam, awayTeam, headToHead }
 }

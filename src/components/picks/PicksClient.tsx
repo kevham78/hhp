@@ -6,6 +6,7 @@ import GamePickCard from './GamePickCard'
 import PhaseBanner from './PhaseBanner'
 import TiebreakerPanel from './TiebreakerPanel'
 import SuicidePanel from './SuicidePanel'
+import StatsPanel from '@/components/stats/StatsPanel'
 
 // ─────────────────────────────────────────────
 // Types
@@ -57,6 +58,11 @@ export default function PicksClient({
   const [formattedDeadline, setFormattedDeadline] = useState('')
   const [formattedSatDate, setFormattedSatDate] = useState('')
   const [formattedSunDate, setFormattedSunDate] = useState('')
+  const [statsGame, setStatsGame] = useState<{ home: string; away: string } | null>(null)
+
+function handleOpenStats(homeCode: string, awayCode: string) {
+  setStatsGame({ home: homeCode, away: awayCode })
+}
 
   useEffect(() => {
     setFormattedDeadline(new Date(deadline).toLocaleString(undefined, {
@@ -299,6 +305,7 @@ function handleRandomPicks() {
       game={game}
       selectedTeam={state.picks[String(game.id)] ?? null}
       onPick={handlePick}
+      onInfo={handleOpenStats}
       isLocked={!isOpen}
     />
   ))}
@@ -315,6 +322,7 @@ function handleRandomPicks() {
       game={game}
       selectedTeam={state.picks[String(game.id)] ?? null}
       onPick={handlePick}
+      onInfo={handleOpenStats}
       isLocked={!isOpen}
     />
   ))}
@@ -380,6 +388,13 @@ function handleRandomPicks() {
           </button>
         </div>
       )}
+      {statsGame && (
+  <StatsPanel
+    homeCode={statsGame.home}
+    awayCode={statsGame.away}
+    onClose={() => setStatsGame(null)}
+  />
+)}
     </div>
   )
 }
