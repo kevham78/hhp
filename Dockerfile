@@ -26,9 +26,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm run build
 
-# ─────────────────────────────────────────────
-# Stage 3: Runner (production image)
-# ─────────────────────────────────────────────
+# Stage 3: Runner
 FROM node:20-alpine AS runner
 RUN apk add --no-cache openssl
 WORKDIR /app
@@ -41,7 +39,11 @@ RUN adduser  --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Copy prisma client and migration tools
+COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=deps /app/node_modules/prisma ./node_modules/prisma
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
@@ -52,5 +54,4 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# Run DB migrations then start the app
-CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node server.js"]
+CMD ["sh", "-c", "./node_modules/prisma/build/index.js migrate deploy && node server.js"]
