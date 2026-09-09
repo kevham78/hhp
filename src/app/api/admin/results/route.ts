@@ -215,6 +215,52 @@ async function handleConfirm(body: any) {
   ])
 
   if (!week || !settings) {
+    // Send results email to all players
+try {
+  const stats   = await prisma.weeklyStat.findMany({
+    where:   { weekId },
+    include: { user: true },
+    orderBy: { points: 'desc' },
+  })
+  const winners     = stats.filter(s => s.isWinner)
+  const isSplit     = winners.length > 1
+  const prizeAmount = isSplit
+    ? settings.weeklyPrize / winners.length
+    : settings.weeklyPrize
+  const topPoints   = stats[0]?.points ?? 0
+
+  const allPlayers = await prisma.user.findMany({
+    where: { isActive: true },
+    select: { email: true, name: true, notifyByEmail: true },
+  })
+
+  const { sendEmail }           = await import('@/lib/email/sendgrid')
+  const { resultsAndPicksEmail } = await import('@/lib/email/templates')
+
+  for (const player of allPlayers) {
+    if (!player.email || !player.notifyByEmail) continue
+    try {
+      await sendEmail({
+        to:      player.email,
+        subject: `🏒 HHP Week ${week.weekNumber} Results`,
+        html:    resultsAndPicksEmail({
+          weekNumber:   week.weekNumber,
+          winnerName:   isSplit ? null : (winners[0]?.user?.name ?? null),
+          winnerPoints: topPoints,
+          isSplit,
+          splitNames:   winners.map(w => w.user?.name ?? ''),
+          prizeAmount,
+          weekId,
+        }),
+      })
+    } catch (emailErr) {
+      console.error('Failed to send results email:', emailErr)
+    }
+  }
+} catch (emailErr) {
+  console.error('Email sending error:', emailErr)
+  // Don't fail the confirm if email fails
+}
     return NextResponse.json({ error: 'Week or settings not found' }, { status: 404 })
   }
 
