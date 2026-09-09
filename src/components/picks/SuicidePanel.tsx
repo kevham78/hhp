@@ -9,6 +9,19 @@ interface PickedTeam {
   game:   NHLGameFromAPI
 }
 
+interface TeamButtonProps {
+  team:          string
+  game:          NHLGameFromAPI
+  isSelected:    boolean
+  isDisabled:    boolean
+  isUsedBefore:  boolean
+  selectedClass: string
+  disabledClass: string
+  defaultClass:  string
+  checkColor:    string
+  onClick:       () => void
+}
+
 interface SuicidePanelProps {
   pickedWinners:     PickedTeam[]
   pickedLosers:      PickedTeam[]
@@ -26,22 +39,13 @@ function TeamButton({
   game,
   isSelected,
   isDisabled,
+  isUsedBefore,
   selectedClass,
   disabledClass,
   defaultClass,
   checkColor,
   onClick,
-}: {
-  team:          string
-  game:          NHLGameFromAPI
-  isSelected:    boolean
-  isDisabled:    boolean
-  selectedClass: string
-  disabledClass: string
-  defaultClass:  string
-  checkColor:    string
-  onClick:       () => void
-}) {
+}: TeamButtonProps) {
   const [label, setLabel] = useState('')
 
   useEffect(() => {
@@ -54,7 +58,11 @@ function TeamButton({
       disabled={isDisabled}
       className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border
                   text-sm font-semibold transition-all ${
-        isSelected ? selectedClass : isDisabled ? disabledClass : defaultClass
+        isSelected ? selectedClass :
+        isDisabled ? (isUsedBefore
+          ? 'border-white/10 text-white/15 cursor-not-allowed line-through'
+          : disabledClass)
+        : defaultClass
       }`}
     >
       <img
@@ -67,16 +75,24 @@ function TeamButton({
         <span className="font-semibold leading-tight">{team}</span>
         <span className="text-xs opacity-50 leading-tight">{label}</span>
       </div>
-      {isSelected && <span className={`ml-auto flex-shrink-0 ${checkColor}`}>✓</span>}
+      {isUsedBefore && (
+        <span className="ml-auto text-xs opacity-40 flex-shrink-0">used</span>
+      )}
+      {isSelected && (
+        <span className={`ml-auto flex-shrink-0 ${checkColor}`}>✓</span>
+      )}
     </button>
   )
 }
+
 export default function SuicidePanel({
   pickedWinners,
   pickedLosers,
   suicide,
   winnerSuicideTeam,
   loserSuicideTeam,
+  winnerTeamsUsed,
+  loserTeamsUsed,
   onSelect,
   isLocked,
 }: SuicidePanelProps) {
@@ -99,29 +115,25 @@ export default function SuicidePanel({
           </p>
           <div className="space-y-1.5">
             {pickedWinners.map(({ gameId, team, game }) => {
-    // Winner column — disable if used in previous weeks OR used as loser this week
-    const isSelected    = suicide.winner === gameId
-    const isUsedBefore  = winnerTeamsUsed.includes(team)
-    const isDisabled    = isLocked || loserSuicideTeam === team || isUsedBefore
-  return (
-    <TeamButton
-      key={`winner-${gameId}`}
-      team={team}
-      game={game}
-      isSelected={isSelected}
-      isDisabled={isDisabled}
-      selectedClass="border-green-500 bg-green-500/15 text-green-400"
-      disabledClass={
-  isUsedBefore
-    ? "border-white/10 text-white/15 cursor-not-allowed line-through"
-    : "border-hhp-navy-light text-white/20 cursor-not-allowed"
-}
-      defaultClass="border-hhp-navy-light text-white/60 hover:text-white hover:border-green-500/40"
-      checkColor="text-green-400"
-      onClick={() => !isDisabled && onSelect('winner', gameId)}
-    />
-  )
-})}
+              const isSelected   = suicide.winner === gameId
+              const isUsedBefore = winnerTeamsUsed.includes(team)
+              const isDisabled   = isLocked || loserSuicideTeam === team || isUsedBefore
+              return (
+                <TeamButton
+                  key={`winner-${gameId}`}
+                  team={team}
+                  game={game}
+                  isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  isUsedBefore={isUsedBefore}
+                  selectedClass="border-green-500 bg-green-500/15 text-green-400"
+                  disabledClass="border-hhp-navy-light text-white/20 cursor-not-allowed"
+                  defaultClass="border-hhp-navy-light text-white/60 hover:text-white hover:border-green-500/40"
+                  checkColor="text-green-400"
+                  onClick={() => !isDisabled && onSelect('winner', gameId)}
+                />
+              )
+            })}
           </div>
         </div>
 
@@ -132,29 +144,25 @@ export default function SuicidePanel({
           </p>
           <div className="space-y-1.5">
             {pickedLosers.map(({ gameId, team, game }) => {
-    // Loser column — disable if used in previous weeks OR used as winner this week
-      const isSelected    = suicide.loser === gameId
-      const isUsedBefore  = loserTeamsUsed.includes(team)
-      const isDisabled    = isLocked || winnerSuicideTeam === team || isUsedBefore
-  return (
-    <TeamButton
-      key={`loser-${gameId}`}
-      team={team}
-      game={game}
-      isSelected={isSelected}
-      isDisabled={isDisabled}
-      selectedClass="border-red-500 bg-red-500/15 text-red-400"
-      disabledClass={
-  isUsedBefore
-    ? "border-white/10 text-white/15 cursor-not-allowed line-through"
-    : "border-hhp-navy-light text-white/20 cursor-not-allowed"
-}
-      defaultClass="border-hhp-navy-light text-white/60 hover:text-white hover:border-red-500/40"
-      checkColor="text-red-400"
-      onClick={() => !isDisabled && onSelect('loser', gameId)}
-    />
-  )
-})}
+              const isSelected   = suicide.loser === gameId
+              const isUsedBefore = loserTeamsUsed.includes(team)
+              const isDisabled   = isLocked || winnerSuicideTeam === team || isUsedBefore
+              return (
+                <TeamButton
+                  key={`loser-${gameId}`}
+                  team={team}
+                  game={game}
+                  isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  isUsedBefore={isUsedBefore}
+                  selectedClass="border-red-500 bg-red-500/15 text-red-400"
+                  disabledClass="border-hhp-navy-light text-white/20 cursor-not-allowed"
+                  defaultClass="border-hhp-navy-light text-white/60 hover:text-white hover:border-red-500/40"
+                  checkColor="text-red-400"
+                  onClick={() => !isDisabled && onSelect('loser', gameId)}
+                />
+              )
+            })}
           </div>
         </div>
 

@@ -6,9 +6,6 @@ import type { User, Week, Game, Pick, SuicidePick, Season, Settings } from '@pri
 export type UserRole = 'PLAYER' | 'ADMIN'
 
 declare module 'next-auth' {
-  interface User {
-    role: UserRole
-  }
   interface Session {
     user: {
       id:    string
