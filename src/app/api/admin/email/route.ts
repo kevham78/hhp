@@ -218,11 +218,6 @@ async function sendNudgeEmail(weekId: string) {
     select: { email: true, name: true },
   })
 
-  console.log('=== NUDGE EMAIL DEBUG ===')
-  console.log('Week found:', !!week)
-  console.log('Admins found:', admins.length)
-  console.log('Admin emails:', admins.map(a => a.email))
-  console.log('========================')
 
   let sent = 0
   for (const admin of admins) {

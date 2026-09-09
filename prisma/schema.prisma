@@ -40,6 +40,7 @@ model User {
   weeklyStats       WeeklyStat[]
   suicideStatus     SuicideStatus[]
   inviteTokens      InviteToken[]
+  monthlyResults    MonthlyResult[]
 
   @@map("users")
 }
@@ -117,6 +118,7 @@ model Season {
   weeks       Week[]
   seasonStats SeasonStat[]
   suicideStatus SuicideStatus[]
+  monthlyResults MonthlyResult[]
   pastWinner  PastSeasonWinner?
 
   @@map("seasons")
@@ -412,4 +414,23 @@ enum NotificationType {
   WEEK_RESULTS
   PAYMENT_LOGGED
   GENERAL
+}
+
+model MonthlyResult {
+  id          String   @id @default(cuid())
+  seasonId    String
+  userId      String
+  month       Int
+  year        Int
+  points      Int      @default(0)
+  isWinner    Boolean  @default(false)
+  isSplit     Boolean  @default(false)
+  prizeAmount Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  season Season @relation(fields: [seasonId], references: [id])
+
+  @@unique([userId, seasonId, month, year])
+  @@map("monthly_results")
 }
