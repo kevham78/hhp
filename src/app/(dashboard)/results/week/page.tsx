@@ -10,8 +10,10 @@ export default async function WeeklyResultsPage({
 }: {
   searchParams: Promise<{ weekId?: string }>
 }) {
-  const { weekId: weekIdParam } = await searchParams
+  const session = await auth()
   if (!session) redirect('/login')
+
+  const { weekId: weekIdParam } = await searchParams
 
   const season = await prisma.season.findFirst({
     where: { isActive: true },
@@ -22,8 +24,8 @@ export default async function WeeklyResultsPage({
 
   if (!weekId && season) {
     const latestWeek = await prisma.week.findFirst({
-      where:   {
-        seasonId:      season.id,
+      where: {
+        seasonId:       season.id,
         picksPublished: true,
       },
       orderBy: { weekNumber: 'desc' },
