@@ -16,10 +16,10 @@ function PuckIcon({ className }: { className?: string }) {
 }
 
 const playerNav = [
-  { href: '/picks',        label: 'My Picks',  icon: PuckIcon },
-  { href: '/results/week', label: 'Results',   icon: Trophy },
-  { href: '/standings',    label: 'Standings', icon: BarChart3 },
-  { href: '/payments',     label: 'Money',     icon: DollarSign },
+  { href: '/picks',     label: 'My Picks',  icon: PuckIcon },
+  { href: '/results/week', label: 'Results', icon: Trophy },
+  { href: '/standings', label: 'Standings', icon: BarChart3 },
+  { href: '/payments',  label: 'Money',     icon: DollarSign },
 ]
 
 const adminNav = [

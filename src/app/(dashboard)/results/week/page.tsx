@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic'
 export default async function WeeklyResultsPage({
   searchParams,
 }: {
-  searchParams: { weekId?: string }
+  searchParams: Promise<{ weekId?: string }>
 }) {
-  const session = await auth()
+  const { weekId: weekIdParam } = await searchParams
   if (!session) redirect('/login')
 
   const season = await prisma.season.findFirst({
@@ -18,7 +18,7 @@ export default async function WeeklyResultsPage({
   })
 
   // If no weekId provided, find the most recent published week
-  let weekId = searchParams.weekId
+  let weekId = weekIdParam
 
   if (!weekId && season) {
     const latestWeek = await prisma.week.findFirst({
