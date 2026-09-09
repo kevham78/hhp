@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db/prisma'
-import { sendEmail } from '@/lib/email/sendgrid'
+import { sendEmail } from '@/lib/email/client'
 import {
   resultsAndPicksEmail,
   picksReminderEmail,
@@ -217,6 +217,12 @@ async function sendNudgeEmail(weekId: string) {
     where: { role: 'ADMIN', isActive: true },
     select: { email: true, name: true },
   })
+
+  console.log('=== NUDGE EMAIL DEBUG ===')
+  console.log('Week found:', !!week)
+  console.log('Admins found:', admins.length)
+  console.log('Admin emails:', admins.map(a => a.email))
+  console.log('========================')
 
   let sent = 0
   for (const admin of admins) {

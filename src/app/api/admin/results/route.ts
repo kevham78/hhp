@@ -234,7 +234,7 @@ try {
     select: { email: true, name: true, notifyByEmail: true },
   })
 
-  const { sendEmail }           = await import('@/lib/email/sendgrid')
+  const { sendEmail }           = await import('@/lib/email/client')
   const { resultsAndPicksEmail } = await import('@/lib/email/templates')
 
   for (const player of allPlayers) {

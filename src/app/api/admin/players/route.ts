@@ -161,28 +161,13 @@ async function handleInvite(body: any, adminId: string) {
     try {
       const sgMail = await import('@sendgrid/mail')
       sgMail.default.setApiKey(process.env.SENDGRID_API_KEY)
-      await sgMail.default.send({
+      const { sendEmail }  = await import('@/lib/email/client')
+      const { inviteEmail } = await import('@/lib/email/templates')
+
+      await sendEmail({
         to:      email,
-        from:    process.env.EMAIL_FROM!,
         subject: "You're invited to join the Hicks Hockey Pool! 🏒",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #d4a843;">🏒 Hicks Hockey Pool</h1>
-            <p>Hi ${name},</p>
-            <p>You've been invited to join the <strong>Hicks Hockey Pool</strong> for the 2026-27 NHL season!</p>
-            <p>Click the link below to create your account:</p>
-            <a href="${inviteUrl}"
-               style="display: inline-block; background: #e8132a; color: white;
-                      padding: 12px 24px; border-radius: 8px; text-decoration: none;
-                      font-weight: bold; margin: 16px 0;">
-              Accept Invite & Create Account
-            </a>
-            <p style="color: #666; font-size: 14px;">
-              This link expires in 7 days. If you have any questions,
-              contact your commissioner.
-            </p>
-          </div>
-        `,
+        html:    inviteEmail({ name, inviteUrl }),
       })
     } catch (emailErr) {
       console.error('Failed to send invite email:', emailErr)
