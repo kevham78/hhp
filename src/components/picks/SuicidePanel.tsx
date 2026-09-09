@@ -15,6 +15,8 @@ interface SuicidePanelProps {
   suicide:           { winner: string | null; loser: string | null }
   winnerSuicideTeam: string | null
   loserSuicideTeam:  string | null
+  winnerTeamsUsed:   string[]
+  loserTeamsUsed:    string[]
   onSelect:          (type: 'winner' | 'loser', gameId: string) => void
   isLocked:          boolean
 }
@@ -97,8 +99,10 @@ export default function SuicidePanel({
           </p>
           <div className="space-y-1.5">
             {pickedWinners.map(({ gameId, team, game }) => {
-  const isSelected = suicide.winner === gameId
-  const isDisabled = isLocked || loserSuicideTeam === team
+    // Winner column — disable if used in previous weeks OR used as loser this week
+    const isSelected    = suicide.winner === gameId
+    const isUsedBefore  = winnerTeamsUsed.includes(team)
+    const isDisabled    = isLocked || loserSuicideTeam === team || isUsedBefore
   return (
     <TeamButton
       key={`winner-${gameId}`}
@@ -107,7 +111,11 @@ export default function SuicidePanel({
       isSelected={isSelected}
       isDisabled={isDisabled}
       selectedClass="border-green-500 bg-green-500/15 text-green-400"
-      disabledClass="border-hhp-navy-light text-white/20 cursor-not-allowed"
+      disabledClass={
+  isUsedBefore
+    ? "border-white/10 text-white/15 cursor-not-allowed line-through"
+    : "border-hhp-navy-light text-white/20 cursor-not-allowed"
+}
       defaultClass="border-hhp-navy-light text-white/60 hover:text-white hover:border-green-500/40"
       checkColor="text-green-400"
       onClick={() => !isDisabled && onSelect('winner', gameId)}
@@ -124,8 +132,10 @@ export default function SuicidePanel({
           </p>
           <div className="space-y-1.5">
             {pickedLosers.map(({ gameId, team, game }) => {
-  const isSelected = suicide.loser === gameId
-  const isDisabled = isLocked || winnerSuicideTeam === team
+    // Loser column — disable if used in previous weeks OR used as winner this week
+      const isSelected    = suicide.loser === gameId
+      const isUsedBefore  = loserTeamsUsed.includes(team)
+      const isDisabled    = isLocked || winnerSuicideTeam === team || isUsedBefore
   return (
     <TeamButton
       key={`loser-${gameId}`}
@@ -134,7 +144,11 @@ export default function SuicidePanel({
       isSelected={isSelected}
       isDisabled={isDisabled}
       selectedClass="border-red-500 bg-red-500/15 text-red-400"
-      disabledClass="border-hhp-navy-light text-white/20 cursor-not-allowed"
+      disabledClass={
+  isUsedBefore
+    ? "border-white/10 text-white/15 cursor-not-allowed line-through"
+    : "border-hhp-navy-light text-white/20 cursor-not-allowed"
+}
       defaultClass="border-hhp-navy-light text-white/60 hover:text-white hover:border-red-500/40"
       checkColor="text-red-400"
       onClick={() => !isDisabled && onSelect('loser', gameId)}

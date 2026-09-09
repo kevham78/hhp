@@ -43,14 +43,22 @@ export default async function PicksPage() {
   }
 
   // Load existing picks for this user
-  const [existingPicks, existingSuicide] = await Promise.all([
-    prisma.pick.findMany({
-      where: { userId: session.user.id, weekId: weekData.id },
-    }),
-    prisma.suicidePick.findMany({
-      where: { userId: session.user.id, weekId: weekData.id },
-    }),
-  ])
+  const [existingPicks, existingSuicide, suicideStatus] = await Promise.all([
+  prisma.pick.findMany({
+    where: { userId: session.user.id, weekId: weekData.id },
+  }),
+  prisma.suicidePick.findMany({
+    where: { userId: session.user.id, weekId: weekData.id },
+  }),
+  prisma.suicideStatus.findUnique({
+    where: {
+      userId_seasonId: {
+        userId:   session.user.id,
+        seasonId: season.id,
+      },
+    },
+  }),
+])
 
  // Shape existing picks into PicksState
 // We need to map DB gameId back to NHL gameId for the UI
@@ -103,14 +111,16 @@ const picksState: PicksState = {
 
   return (
     <PicksClient
-      saturdayGames={saturday}
-      sundayGames={sunday}
-      saturdayDate={formatDate(satDate)}
-      sundayDate={formatDate(sunDate)}
-      weekId={weekData.id}
-      deadline={weekData.picksDeadline.toISOString()}
-      existingPicks={picksState}
-      isOpen={isOpen}
-    />
+  saturdayGames={saturday}
+  sundayGames={sunday}
+  saturdayDate={formatDate(satDate)}
+  sundayDate={formatDate(sunDate)}
+  weekId={weekData.id}
+  deadline={weekData.picksDeadline.toISOString()}
+  existingPicks={picksState}
+  isOpen={isOpen}
+  winnerTeamsUsed={suicideStatus?.winnerTeamsUsed ?? []}
+  loserTeamsUsed={suicideStatus?.loserTeamsUsed   ?? []}
+/>
   )
 }

@@ -25,14 +25,16 @@ export type PicksState = {
 }
 
 interface PicksClientProps {
-  saturdayGames:  NHLGameFromAPI[]
-  sundayGames:    NHLGameFromAPI[]
-  saturdayDate:   string
-  sundayDate:     string
-  weekId:         string
-  deadline:       string
-  existingPicks:  PicksState
-  isOpen:         boolean
+  saturdayGames:    NHLGameFromAPI[]
+  sundayGames:      NHLGameFromAPI[]
+  saturdayDate:     string
+  sundayDate:       string
+  weekId:           string
+  deadline:         string
+  existingPicks:    PicksState
+  isOpen:           boolean
+  winnerTeamsUsed:  string[]
+  loserTeamsUsed:   string[]
 }
 
 
@@ -49,6 +51,8 @@ export default function PicksClient({
   deadline,
   existingPicks,
   isOpen,
+  winnerTeamsUsed,
+  loserTeamsUsed,
 }: PicksClientProps) {
 
   const [state, setState] = useState<PicksState>(existingPicks)
@@ -361,6 +365,8 @@ function handleRandomPicks() {
   suicide={state.suicide}
   winnerSuicideTeam={winnerSuicideTeam}
   loserSuicideTeam={loserSuicideTeam}
+  winnerTeamsUsed={winnerTeamsUsed}
+  loserTeamsUsed={loserTeamsUsed}
   onSelect={handleSuicide}
   isLocked={!isOpen}
 />

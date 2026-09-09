@@ -3,6 +3,13 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 
+// Start cron scheduler on app boot (server side only)
+if (typeof window === 'undefined') {
+  import('@/lib/cron/scheduler').then(({ startScheduler }) => {
+    startScheduler().catch(console.error)
+  })
+}
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
