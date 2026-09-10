@@ -25,7 +25,7 @@ export default async function PicksPage() {
           </p>
           {session.user.role === 'ADMIN' && (
             
-              href="/admin/settings"
+              <a href="/admin/settings"
               className="inline-block mt-6 px-6 py-2.5 rounded-lg bg-hhp-red
                          text-white font-bold text-sm hover:bg-hhp-red-dark
                          transition-colors"
