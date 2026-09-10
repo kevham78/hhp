@@ -103,6 +103,32 @@ export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
 
 async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
   const dateStr = formatDate(date)
+  try {
+    const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+
+    const dayEntry = data.gameWeek?.find((day: any) => day.date === dateStr)
+    if (!dayEntry) return []
+
+    return (dayEntry.games || [])
+      .filter((g: NHLGameFromAPI) => g.gameType === 2)
+      .filter((g: NHLGameFromAPI) => {
+        // Only include games that actually start on the requested date
+        // in Eastern time (excludes late Friday night games bleeding into Saturday)
+        const gameEasternDate = new Date(g.startTimeUTC)
+          .toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
+        return gameEasternDate === dateStr
+      })
+  } catch (err) {
+    console.error(`Failed to fetch NHL schedule for ${dateStr}:`, err)
+    return []
+  }
+}  
+
+const dateStr = formatDate(date)
 
   try {
     const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
