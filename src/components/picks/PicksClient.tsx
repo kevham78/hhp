@@ -93,7 +93,7 @@ function handleOpenStats(homeCode: string, awayCode: string) {
 const allGames    = [...saturdayGames, ...sundayGames]
   const totalGames  = allGames.length
   const pickedCount = Object.keys(state.picks).length
-  const allPicked   = pickedCount === totalGames
+  const allPicked = pickedCount === totalGames && totalGames > 0
 
   // Winners picked this week (for tiebreaker selection)
   const pickedWinners = Object.entries(state.picks).map(([gameId, team]) => ({

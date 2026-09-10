@@ -23,6 +23,16 @@ export default async function PicksPage() {
           <p className="text-white/40 text-sm mt-1">
             The commissioner hasn't started the season yet. Check back soon!
           </p>
+          {session.user.role === 'ADMIN' && (
+            
+              href="/admin/settings"
+              className="inline-block mt-6 px-6 py-2.5 rounded-lg bg-hhp-red
+                         text-white font-bold text-sm hover:bg-hhp-red-dark
+                         transition-colors"
+            >
+              Start Season →
+            </a>
+          )}
         </div>
       </div>
     )
@@ -44,83 +54,81 @@ export default async function PicksPage() {
 
   // Load existing picks for this user
   const [existingPicks, existingSuicide, suicideStatus] = await Promise.all([
-  prisma.pick.findMany({
-    where: { userId: session.user.id, weekId: weekData.id },
-  }),
-  prisma.suicidePick.findMany({
-    where: { userId: session.user.id, weekId: weekData.id },
-  }),
-  prisma.suicideStatus.findUnique({
-    where: {
-      userId_seasonId: {
-        userId:   session.user.id,
-        seasonId: season.id,
+    prisma.pick.findMany({
+      where: { userId: session.user.id, weekId: weekData.id },
+    }),
+    prisma.suicidePick.findMany({
+      where: { userId: session.user.id, weekId: weekData.id },
+    }),
+    prisma.suicideStatus.findUnique({
+      where: {
+        userId_seasonId: {
+          userId:   session.user.id,
+          seasonId: season.id,
+        },
       },
+    }),
+  ])
+
+  // Shape existing picks into PicksState
+  const picksState: PicksState = {
+    picks: Object.fromEntries(
+      existingPicks
+        .map(p => {
+          const game = weekData.games.find(g => g.id === p.gameId)
+          return game ? [game.nhlGameId, p.pickedTeam] : null
+        })
+        .filter(Boolean) as [string, string][]
+    ),
+    tiebreakers: Object.fromEntries(
+      existingPicks
+        .filter(p => p.tiebreakerRank)
+        .map(p => {
+          const game = weekData.games.find(g => g.id === p.gameId)
+          return game ? [game.nhlGameId, p.tiebreakerRank!] : null
+        })
+        .filter(Boolean) as [string, number][]
+    ),
+    suicide: {
+      winner: (() => {
+        const wp = existingSuicide.find(s => s.poolType === 'WINNER')
+        if (!wp) return null
+        const game = weekData.games.find(g =>
+          g.homeTeamCode === wp.pickedTeam || g.awayTeamCode === wp.pickedTeam
+        )
+        return game ? game.nhlGameId : null
+      })(),
+      loser: (() => {
+        const lp = existingSuicide.find(s => s.poolType === 'LOSER')
+        if (!lp) return null
+        const game = weekData.games.find(g =>
+          g.homeTeamCode === lp.pickedTeam || g.awayTeamCode === lp.pickedTeam
+        )
+        return game ? game.nhlGameId : null
+      })(),
     },
-  }),
-])
+  }
 
- // Shape existing picks into PicksState
-// We need to map DB gameId back to NHL gameId for the UI
-const picksState: PicksState = {
-  picks: Object.fromEntries(
-    existingPicks
-    
-      .map(p => {
-        const game = weekData.games.find(g => g.id === p.gameId)
-        return game ? [game.nhlGameId, p.pickedTeam] : null
-      })
-      .filter(Boolean) as [string, string][]
-  ),
-  tiebreakers: Object.fromEntries(
-    existingPicks
-      .filter(p => p.tiebreakerRank)
-      .map(p => {
-        const game = weekData.games.find(g => g.id === p.gameId)
-        return game ? [game.nhlGameId, p.tiebreakerRank!] : null
-      })
-      .filter(Boolean) as [string, number][]
-  ),
-  suicide: {
-    winner: (() => {
-      const wp = existingSuicide.find(s => s.poolType === 'WINNER')
-      if (!wp) return null
-      // Find the NHL game ID where this team was picked
-      const game = weekData.games.find(g =>
-        g.homeTeamCode === wp.pickedTeam || g.awayTeamCode === wp.pickedTeam
-      )
-      return game ? game.nhlGameId : null
-    })(),
-    loser: (() => {
-      const lp = existingSuicide.find(s => s.poolType === 'LOSER')
-      if (!lp) return null
-      // For loser, the stored team is the losing team — find its game
-      const game = weekData.games.find(g =>
-        g.homeTeamCode === lp.pickedTeam || g.awayTeamCode === lp.pickedTeam
-      )
-      return game ? game.nhlGameId : null
-    })(),
-  },
-}
-
-
+  // Use the weekend dates from getOrCreateCurrentWeek's perspective
+  // so the displayed dates match the actual games loaded
   const { saturday: satDate, sunday: sunDate } = getUpcomingWeekend()
-  const isOpen = process.env.NODE_ENV === 'development' 
-  ? true 
-  : new Date() < new Date(weekData.picksDeadline)
+
+  const isOpen = process.env.NODE_ENV === 'development'
+    ? true
+    : new Date() < new Date(weekData.picksDeadline)
 
   return (
     <PicksClient
-  saturdayGames={saturday}
-  sundayGames={sunday}
-  saturdayDate={formatDate(satDate)}
-  sundayDate={formatDate(sunDate)}
-  weekId={weekData.id}
-  deadline={weekData.picksDeadline.toISOString()}
-  existingPicks={picksState}
-  isOpen={isOpen}
-  winnerTeamsUsed={suicideStatus?.winnerTeamsUsed ?? []}
-  loserTeamsUsed={suicideStatus?.loserTeamsUsed   ?? []}
-/>
+      saturdayGames={saturday}
+      sundayGames={sunday}
+      saturdayDate={formatDate(satDate)}
+      sundayDate={formatDate(sunDate)}
+      weekId={weekData.id}
+      deadline={weekData.picksDeadline.toISOString()}
+      existingPicks={picksState}
+      isOpen={isOpen}
+      winnerTeamsUsed={suicideStatus?.winnerTeamsUsed ?? []}
+      loserTeamsUsed={suicideStatus?.loserTeamsUsed   ?? []}
+    />
   )
 }
