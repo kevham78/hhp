@@ -120,14 +120,18 @@ async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
     if (!dayEntry) return []
 
     return (dayEntry.games || [])
-      .filter((g: NHLGameFromAPI) => g.gameType === 2)
-      .filter((g: NHLGameFromAPI) => {
-        // Only include games that actually start on the requested date
-        // in Eastern time — excludes Friday night games bleeding into Saturday
-        const gameEasternDate = new Date(g.startTimeUTC)
-          .toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
-        return gameEasternDate === dateStr
-      })
+  .filter((g: NHLGameFromAPI) => g.gameType === 2)
+  .filter((g: NHLGameFromAPI) => {
+    const gameUTC  = new Date(g.startTimeUTC)
+    const month    = gameUTC.getUTCMonth()
+    const isEDT    = month >= 2 && month <= 10
+    const offsetMs = (isEDT ? 4 : 5) * 60 * 60 * 1000
+    const easternTime = new Date(gameUTC.getTime() - offsetMs)
+    const y = easternTime.getUTCFullYear()
+    const m = String(easternTime.getUTCMonth() + 1).padStart(2, '0')
+    const d = String(easternTime.getUTCDate()).padStart(2, '0')
+    return `${y}-${m}-${d}` === dateStr
+  })
   } catch (err) {
     console.error(`Failed to fetch NHL schedule for ${dateStr}:`, err)
     return []

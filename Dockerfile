@@ -28,7 +28,7 @@ RUN npm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl icu-data-full
 WORKDIR /app
 
 ENV NODE_ENV production
