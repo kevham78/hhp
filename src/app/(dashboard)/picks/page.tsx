@@ -39,10 +39,20 @@ export default async function PicksPage() {
   }
 
   // Get weekend games from NHL API and current week from DB in parallel
-  const [{ saturday, sunday }, weekData] = await Promise.all([
-    getWeekendGames(),
-    getOrCreateCurrentWeek(),
-  ])
+  const weekData = await getOrCreateCurrentWeek()
+
+if (!weekData) {
+  return (
+    <div className="hhp-card text-center py-12">
+      <p className="text-white/50">Unable to load this week's games. Try again shortly.</p>
+    </div>
+  )
+}
+
+const { saturday, sunday } = await getWeekendGames(
+  new Date(weekData.saturdayDate),
+  new Date(weekData.sundayDate)
+)
 
   if (!weekData) {
     return (
@@ -111,7 +121,9 @@ export default async function PicksPage() {
 
   // Use the weekend dates from getOrCreateCurrentWeek's perspective
   // so the displayed dates match the actual games loaded
-  const { saturday: satDate, sunday: sunDate } = getUpcomingWeekend()
+ // Use the actual week dates from the database, not today's upcoming weekend
+const satDate = new Date(weekData.saturdayDate as Date)
+const sunDate = new Date(weekData.sundayDate as Date)
 
   const isOpen = process.env.NODE_ENV === 'development'
     ? true
