@@ -137,12 +137,15 @@ async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
 // Fetch both Saturday and Sunday games
 // ─────────────────────────────────────────────
 
-export async function getWeekendGames(): Promise<WeekendGames> {
+export async function getWeekendGames(
+  overrideSaturday?: Date,
+  overrideSunday?:   Date
+): Promise<WeekendGames> {
   const { saturday, sunday } = getUpcomingWeekend()
 
   const [satGames, sunGames] = await Promise.all([
-    getGamesForDate(saturday),
-    getGamesForDate(sunday),
+    getGamesForDate(overrideSaturday ?? saturday),
+    getGamesForDate(overrideSunday   ?? sunday),
   ])
 
   return {

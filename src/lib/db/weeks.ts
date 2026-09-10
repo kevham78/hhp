@@ -1,13 +1,38 @@
 import { prisma } from '@/lib/db/prisma'
 import { getUpcomingWeekend, getWeekendGames } from '@/lib/api/nhl'
 
+// ─────────────────────────────────────────────
+// Get the target weekend — either the upcoming
+// one or the first weekend of the season if
+// we're before the season start date
+// ─────────────────────────────────────────────
+
+function getTargetWeekend(seasonStartDate: Date): { saturday: Date; sunday: Date } {
+  const now = new Date()
+
+  if (now < seasonStartDate) {
+    // Before season starts — find first Saturday on or after season start
+    const firstSat = new Date(seasonStartDate)
+    firstSat.setUTCHours(0, 0, 0, 0)
+    while (firstSat.getUTCDay() !== 6) {
+      firstSat.setDate(firstSat.getDate() + 1)
+    }
+    const firstSun = new Date(firstSat)
+    firstSun.setDate(firstSat.getDate() + 1)
+    return { saturday: firstSat, sunday: firstSun }
+  }
+
+  // During the season — use upcoming weekend
+  return getUpcomingWeekend()
+}
+
 export async function getOrCreateCurrentWeek() {
   const season = await prisma.season.findFirst({
     where: { isActive: true },
   })
   if (!season) return null
 
-  const { saturday, sunday } = getUpcomingWeekend()
+  const { saturday, sunday } = getTargetWeekend(new Date(season.startDate))
 
   const satStart = new Date(saturday)
   satStart.setUTCHours(0, 0, 0, 0)
@@ -29,8 +54,8 @@ export async function getOrCreateCurrentWeek() {
     where: { id: 'default' },
   })
 
-  const deadline   = getPicksDeadline(saturday, settings?.picksRevealTime ?? '14:00')
-  const weekCount  = await prisma.week.count({ where: { seasonId: season.id } })
+  const deadline  = getPicksDeadline(saturday, settings?.picksRevealTime ?? '14:00')
+  const weekCount = await prisma.week.count({ where: { seasonId: season.id } })
 
   // Create the week
   const week = await prisma.week.create({
@@ -45,47 +70,47 @@ export async function getOrCreateCurrentWeek() {
   })
 
   // Fetch games from NHL API and save to DB
-  const { saturday: satGames, sunday: sunGames } = await getWeekendGames()
+  const { saturday: satGames, sunday: sunGames } = await getWeekendGames(saturday, sunday)
 
   for (const game of satGames) {
-  try {
-    await prisma.game.create({
-      data: {
-        weekId:       week.id,
-        nhlGameId:    String(game.id),
-        homeTeam:     game.homeTeam.abbrev,
-        awayTeam:     game.awayTeam.abbrev,
-        homeTeamCode: game.homeTeam.abbrev,
-        awayTeamCode: game.awayTeam.abbrev,
-        gameTime:     new Date(game.startTimeUTC),
-        gameDay:      'SATURDAY',
-        status:       'SCHEDULED',
-      },
-    })
-  } catch (err) {
+    try {
+      await prisma.game.create({
+        data: {
+          weekId:       week.id,
+          nhlGameId:    String(game.id),
+          homeTeam:     game.homeTeam.abbrev,
+          awayTeam:     game.awayTeam.abbrev,
+          homeTeamCode: game.homeTeam.abbrev,
+          awayTeamCode: game.awayTeam.abbrev,
+          gameTime:     new Date(game.startTimeUTC),
+          gameDay:      'SATURDAY',
+          status:       'SCHEDULED',
+        },
+      })
+    } catch (err) {
+      console.error('Failed to save Saturday game:', game.id, err)
+    }
   }
-}
-
 
   for (const game of sunGames) {
-  try {
-    await prisma.game.create({
-      data: {
-        weekId:       week.id,
-        nhlGameId:    String(game.id),
-        homeTeam:     game.homeTeam.abbrev,
-        awayTeam:     game.awayTeam.abbrev,
-        homeTeamCode: game.homeTeam.abbrev,
-        awayTeamCode: game.awayTeam.abbrev,
-        gameTime:     new Date(game.startTimeUTC),
-        gameDay:      'SUNDAY',
-        status:       'SCHEDULED',
-      },
-    })
-  } catch (err) {
-    
+    try {
+      await prisma.game.create({
+        data: {
+          weekId:       week.id,
+          nhlGameId:    String(game.id),
+          homeTeam:     game.homeTeam.abbrev,
+          awayTeam:     game.awayTeam.abbrev,
+          homeTeamCode: game.homeTeam.abbrev,
+          awayTeamCode: game.awayTeam.abbrev,
+          gameTime:     new Date(game.startTimeUTC),
+          gameDay:      'SUNDAY',
+          status:       'SCHEDULED',
+        },
+      })
+    } catch (err) {
+      console.error('Failed to save Sunday game:', game.id, err)
+    }
   }
-}
 
   return prisma.week.findUnique({
     where:   { id: week.id },
