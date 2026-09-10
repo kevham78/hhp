@@ -1,29 +1,25 @@
-// NHL API Client
-// Base URL: https://api-web.nhle.com/v1
-// No API key required — this is the same API the NHL website uses
-
 const NHL_API = 'https://api-web.nhle.com/v1'
 
 // ─────────────────────────────────────────────
-// Types matching the NHL API response shape
+// Types
 // ─────────────────────────────────────────────
 
 export type NHLGameFromAPI = {
   id:           number
-  gameType:     number  // 2 = regular season, 3 = playoffs
-  gameState:    string  // 'FUT', 'PRE', 'LIVE', 'OFF', 'FINAL'
+  gameType:     number
+  gameState:    string
   startTimeUTC: string
   awayTeam: {
-    abbrev:     string
-    name:       { default: string }
-    logo:       string
-    score?:     number
+    abbrev: string
+    name:   { default: string }
+    logo:   string
+    score?: number
   }
   homeTeam: {
-    abbrev:     string
-    name:       { default: string }
-    logo:       string
-    score?:     number
+    abbrev: string
+    name:   { default: string }
+    logo:   string
+    score?: number
   }
 }
 
@@ -33,25 +29,25 @@ export type WeekendGames = {
 }
 
 export type TeamStanding = {
-  teamAbbrev:      { default: string }
-  teamName:        { default: string }
-  teamLogo:        string
-  wins:            number
-  losses:          number
-  otLosses:        number
-  points:          number
-  gamesPlayed:     number
-  l10Wins:         number
-  l10Losses:       number
-  l10OtLosses:     number
-  streakCode:      string  // 'W' or 'L'
-  streakCount:     number
-  divisionName:    string
-  conferenceName:  string
+  teamAbbrev:     { default: string }
+  teamName:       { default: string }
+  teamLogo:       string
+  wins:           number
+  losses:         number
+  otLosses:       number
+  points:         number
+  gamesPlayed:    number
+  l10Wins:        number
+  l10Losses:      number
+  l10OtLosses:    number
+  streakCode:     string
+  streakCount:    number
+  divisionName:   string
+  conferenceName: string
 }
 
 // ─────────────────────────────────────────────
-// Helper: format date as YYYY-MM-DD
+// Format date as YYYY-MM-DD
 // ─────────────────────────────────────────────
 
 export function formatDate(date: Date): string {
@@ -62,18 +58,17 @@ export function formatDate(date: Date): string {
 }
 
 // ─────────────────────────────────────────────
-// Get the upcoming Saturday and Sunday dates
-// from any given date
+// Get upcoming Saturday and Sunday
 // ─────────────────────────────────────────────
 
 export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
   // In development, hardcode a known good weekend with NHL games
   if (process.env.NODE_ENV === 'development') {
-  return {
-    saturday: new Date('2026-10-03T12:00:00Z'),
-    sunday:   new Date('2026-10-04T12:00:00Z'),
+    return {
+      saturday: new Date('2026-10-03T12:00:00Z'),
+      sunday:   new Date('2026-10-04T12:00:00Z'),
+    }
   }
-}
 
   const now       = new Date()
   const dayOfWeek = now.getDay()
@@ -99,40 +94,16 @@ export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
 
 // ─────────────────────────────────────────────
 // Fetch games for a specific date
+// Only returns games that start on that date
+// in Eastern time (excludes Friday bleed-over)
 // ─────────────────────────────────────────────
 
 async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
   const dateStr = formatDate(date)
-  try {
-    const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
-      cache: 'no-store',
-    })
-    if (!res.ok) return []
-    const data = await res.json()
-
-    const dayEntry = data.gameWeek?.find((day: any) => day.date === dateStr)
-    if (!dayEntry) return []
-
-    return (dayEntry.games || [])
-      .filter((g: NHLGameFromAPI) => g.gameType === 2)
-      .filter((g: NHLGameFromAPI) => {
-        // Only include games that actually start on the requested date
-        // in Eastern time (excludes late Friday night games bleeding into Saturday)
-        const gameEasternDate = new Date(g.startTimeUTC)
-          .toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
-        return gameEasternDate === dateStr
-      })
-  } catch (err) {
-    console.error(`Failed to fetch NHL schedule for ${dateStr}:`, err)
-    return []
-  }
-}  
-
-const dateStr = formatDate(date)
 
   try {
     const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: 3600 },
     })
 
     if (!res.ok) {
@@ -142,17 +113,21 @@ const dateStr = formatDate(date)
 
     const data = await res.json()
 
-    // The API returns a gameWeek array — find the entry matching our date
     const dayEntry = data.gameWeek?.find(
       (day: any) => day.date === dateStr
     )
 
     if (!dayEntry) return []
 
-    // Filter to regular season games only (gameType === 2)
-    return (dayEntry.games || []).filter(
-      (g: NHLGameFromAPI) => g.gameType === 2
-    )
+    return (dayEntry.games || [])
+      .filter((g: NHLGameFromAPI) => g.gameType === 2)
+      .filter((g: NHLGameFromAPI) => {
+        // Only include games that actually start on the requested date
+        // in Eastern time — excludes Friday night games bleeding into Saturday
+        const gameEasternDate = new Date(g.startTimeUTC)
+          .toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
+        return gameEasternDate === dateStr
+      })
   } catch (err) {
     console.error(`Failed to fetch NHL schedule for ${dateStr}:`, err)
     return []
@@ -181,70 +156,7 @@ export async function getWeekendGames(
 }
 
 // ─────────────────────────────────────────────
-// Fetch current standings
-// ─────────────────────────────────────────────
-
-export async function getStandings(): Promise<TeamStanding[]> {
-  try {
-    const today = formatDate(new Date())
-    const res   = await fetch(`${NHL_API}/standings/${today}`, {
-      next: { revalidate: 3600 },
-    })
-
-    if (!res.ok) return []
-
-    const data = await res.json()
-    return data.standings || []
-  } catch (err) {
-    console.error('Failed to fetch NHL standings:', err)
-    return []
-  }
-}
-
-// ─────────────────────────────────────────────
-// Get team logo URL
-// ─────────────────────────────────────────────
-
-export function getTeamLogoUrl(teamCode: string): string {
-  return `https://assets.nhle.com/logos/nhl/svg/${teamCode}_dark.svg`
-}
-
-// ─────────────────────────────────────────────
-// Get last 10 record string for a team
-// from standings data
-// ─────────────────────────────────────────────
-
-export function getLast10Record(standing: TeamStanding): string {
-  const { l10Wins, l10Losses, l10OtLosses } = standing
-  return `${l10Wins}-${l10Losses}-${l10OtLosses}`
-}
-
-// ─────────────────────────────────────────────
-// Get streak string e.g. "W3" or "L2"
-// ─────────────────────────────────────────────
-
-export function getStreakString(standing: TeamStanding): string {
-  return `${standing.streakCode}${standing.streakCount}`
-}
-
-export function getGameLabel(game: NHLGameFromAPI, pickedTeam: string): string {
-  if (typeof window === 'undefined') return pickedTeam
-
-  const day = new Date(game.startTimeUTC).toLocaleDateString(undefined, {
-    weekday: 'short',
-  })
-
-  const opponent = game.awayTeam.abbrev === pickedTeam
-    ? game.homeTeam.abbrev
-    : game.awayTeam.abbrev
-
-  const isHome = game.homeTeam.abbrev === pickedTeam
-
-  return `${day} ${isHome ? 'vs' : '@'} ${opponent}`
-}
-
-// ─────────────────────────────────────────────
-// Fetch final scores for a specific date
+// Fetch scores for a specific date (results)
 // ─────────────────────────────────────────────
 
 export type NHLGameResult = {
@@ -253,7 +165,7 @@ export type NHLGameResult = {
   awayTeamCode: string
   homeScore:    number
   awayScore:    number
-  gameState:    string  // 'OFF' = final, 'LIVE', 'FUT'
+  gameState:    string
   isLive:       boolean
   isFinal:      boolean
 }
@@ -262,7 +174,7 @@ async function getResultsForDate(date: Date): Promise<NHLGameResult[]> {
   const dateStr = formatDate(date)
   try {
     const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
-      cache: 'no-store', // always fresh for results
+      cache: 'no-store',
     })
     if (!res.ok) return []
     const data = await res.json()
@@ -272,6 +184,11 @@ async function getResultsForDate(date: Date): Promise<NHLGameResult[]> {
 
     return (dayEntry.games || [])
       .filter((g: any) => g.gameType === 2)
+      .filter((g: any) => {
+        const gameEasternDate = new Date(g.startTimeUTC)
+          .toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
+        return gameEasternDate === dateStr
+      })
       .map((g: any) => ({
         nhlGameId:    String(g.id),
         homeTeamCode: g.homeTeam.abbrev,
@@ -296,4 +213,60 @@ export async function getWeekendResults(
     getResultsForDate(sundayDate),
   ])
   return [...satResults, ...sunResults]
+}
+
+// ─────────────────────────────────────────────
+// Fetch standings
+// ─────────────────────────────────────────────
+
+export async function getStandings(): Promise<TeamStanding[]> {
+  try {
+    const today = formatDate(new Date())
+    const res   = await fetch(`${NHL_API}/standings/${today}`, {
+      next: { revalidate: 3600 },
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.standings || []
+  } catch {
+    return []
+  }
+}
+
+// ─────────────────────────────────────────────
+// Team logo URL
+// ─────────────────────────────────────────────
+
+export function getTeamLogoUrl(teamCode: string): string {
+  return `https://assets.nhle.com/logos/nhl/svg/${teamCode}_dark.svg`
+}
+
+// ─────────────────────────────────────────────
+// Game label for tiebreaker/suicide display
+// e.g. "Sat @ TOR"
+// ─────────────────────────────────────────────
+
+export function getGameLabel(game: NHLGameFromAPI, pickedTeam: string): string {
+  if (typeof window === 'undefined') return pickedTeam
+
+  const day = new Date(game.startTimeUTC).toLocaleDateString(undefined, {
+    weekday: 'short',
+  })
+
+  const opponent = game.awayTeam.abbrev === pickedTeam
+    ? game.homeTeam.abbrev
+    : game.awayTeam.abbrev
+
+  const isHome = game.homeTeam.abbrev === pickedTeam
+
+  return `${day} ${isHome ? 'vs' : '@'} ${opponent}`
+}
+
+export function getLast10Record(standing: TeamStanding): string {
+  const { l10Wins, l10Losses, l10OtLosses } = standing
+  return `${l10Wins}-${l10Losses}-${l10OtLosses}`
+}
+
+export function getStreakString(standing: TeamStanding): string {
+  return `${standing.streakCode}${standing.streakCount}`
 }
