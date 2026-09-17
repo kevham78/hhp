@@ -18,9 +18,10 @@ export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLoc
   const [gameTime, setGameTime] = useState('')
 
   useEffect(() => {
-    setGameTime(new Date(game.startTimeUTC).toLocaleTimeString(undefined, {
-      hour:   'numeric',
-      minute: '2-digit',
+    setGameTime(new Date(game.startTimeUTC).toLocaleTimeString('en-US', {
+      hour:     'numeric',
+      minute:   '2-digit',
+      timeZone: 'America/New_York',
     }))
   }, [game.startTimeUTC])
 

@@ -47,31 +47,66 @@ export type TeamStanding = {
 }
 
 // ─────────────────────────────────────────────
+// Eastern Time helpers
+//
+// Docker's Alpine Linux Node build lacks full ICU timezone data, so
+// Intl/toLocaleString with a `timeZone` option is unreliable there.
+// Everywhere this app needs to know "what Eastern calendar date does
+// this UTC instant fall on", it uses this manual offset instead.
+// (Approximates DST as March–November; exact enough for the NHL
+// season, which runs October–June.)
+// ─────────────────────────────────────────────
+
+export function easternOffsetHours(date: Date): number {
+  const month = date.getUTCMonth()
+  const isEDT = month >= 2 && month <= 10
+  return isEDT ? 4 : 5
+}
+
+export function toEasternDateStr(date: Date): string {
+  const offsetMs = easternOffsetHours(date) * 60 * 60 * 1000
+  const eastern  = new Date(date.getTime() - offsetMs)
+  const y = eastern.getUTCFullYear()
+  const m = String(eastern.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(eastern.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+// ─────────────────────────────────────────────
 // Format date as YYYY-MM-DD
+//
+// `date` is expected to be a UTC-midnight-normalized "calendar date"
+// (as stored on Week.saturdayDate/sundayDate), so this reads it back
+// with UTC getters — using local getters here caused the Week's
+// stored Saturday to render as "Friday" on any host running in a
+// timezone behind UTC (e.g. Eastern), since midnight UTC Saturday is
+// still Friday evening local time.
 // ─────────────────────────────────────────────
 
 export function formatDate(date: Date): string {
-  const year  = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day   = String(date.getDate()).padStart(2, '0')
+  const year  = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day   = String(date.getUTCDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
 
 // ─────────────────────────────────────────────
-// Get upcoming Saturday and Sunday
+// Get upcoming Saturday and Sunday (as Eastern
+// calendar dates, returned as UTC-midnight Dates)
 // ─────────────────────────────────────────────
 
 export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
   // In development, hardcode a known good weekend with NHL games
   if (process.env.NODE_ENV === 'development') {
     return {
-      saturday: new Date('2026-10-03T12:00:00Z'),
-      sunday:   new Date('2026-10-04T12:00:00Z'),
+      saturday: new Date('2026-10-03T00:00:00Z'),
+      sunday:   new Date('2026-10-04T00:00:00Z'),
     }
   }
 
-  const now       = new Date()
-  const dayOfWeek = now.getDay()
+  const now         = new Date()
+  const easternNow  = new Date(now.getTime() - easternOffsetHours(now) * 60 * 60 * 1000)
+  const dayOfWeek   = easternNow.getUTCDay()
 
   let daysUntilSat: number
   if (dayOfWeek === 6) {
@@ -82,12 +117,16 @@ export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
     daysUntilSat = 6 - dayOfWeek
   }
 
-  const saturday = new Date(now)
-  saturday.setDate(now.getDate() + daysUntilSat)
-  saturday.setHours(0, 0, 0, 0)
-
-  const sunday = new Date(saturday)
-  sunday.setDate(saturday.getDate() + (dayOfWeek === 0 ? 0 : 1))
+  const saturday = new Date(Date.UTC(
+    easternNow.getUTCFullYear(),
+    easternNow.getUTCMonth(),
+    easternNow.getUTCDate() + daysUntilSat,
+  ))
+  const sunday = new Date(Date.UTC(
+    saturday.getUTCFullYear(),
+    saturday.getUTCMonth(),
+    saturday.getUTCDate() + 1,
+  ))
 
   return { saturday, sunday }
 }
@@ -121,18 +160,8 @@ async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
     if (!dayEntry) return []
 
     return (dayEntry.games || [])
-  .filter((g: NHLGameFromAPI) => g.gameType === 2)
-  .filter((g: NHLGameFromAPI) => {
-    const gameUTC  = new Date(g.startTimeUTC)
-    const month    = gameUTC.getUTCMonth()
-    const isEDT    = month >= 2 && month <= 10
-    const offsetMs = (isEDT ? 4 : 5) * 60 * 60 * 1000
-    const easternTime = new Date(gameUTC.getTime() - offsetMs)
-    const y = easternTime.getUTCFullYear()
-    const m = String(easternTime.getUTCMonth() + 1).padStart(2, '0')
-    const d = String(easternTime.getUTCDate()).padStart(2, '0')
-    return `${y}-${m}-${d}` === dateStr
-  })
+      .filter((g: NHLGameFromAPI) => g.gameType === 2)
+      .filter((g: NHLGameFromAPI) => toEasternDateStr(new Date(g.startTimeUTC)) === dateStr)
   } catch (err) {
     console.error(`Failed to fetch NHL schedule for ${dateStr}:`, err)
     return []
@@ -190,9 +219,7 @@ async function getResultsForDate(date: Date): Promise<NHLGameResult[]> {
     return (dayEntry.games || [])
       .filter((g: any) => g.gameType === 2)
       .filter((g: any) => {
-        const gameEasternDate = new Date(g.startTimeUTC)
-          .toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
-        return gameEasternDate === dateStr
+        return toEasternDateStr(new Date(g.startTimeUTC)) === dateStr
       })
       .map((g: any) => ({
         nhlGameId:    String(g.id),
@@ -254,8 +281,9 @@ export function getTeamLogoUrl(teamCode: string): string {
 export function getGameLabel(game: NHLGameFromAPI, pickedTeam: string): string {
   if (typeof window === 'undefined') return pickedTeam
 
-  const day = new Date(game.startTimeUTC).toLocaleDateString(undefined, {
+  const day = new Date(game.startTimeUTC).toLocaleDateString('en-US', {
     weekday: 'short',
+    timeZone: 'America/New_York',
   })
 
   const opponent = game.awayTeam.abbrev === pickedTeam

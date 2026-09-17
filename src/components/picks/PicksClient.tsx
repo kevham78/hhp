@@ -69,12 +69,13 @@ function handleOpenStats(homeCode: string, awayCode: string) {
 }
 
   useEffect(() => {
-    setFormattedDeadline(new Date(deadline).toLocaleString(undefined, {
+    setFormattedDeadline(new Date(deadline).toLocaleString('en-US', {
       weekday:      'long',
       month:        'short',
       day:          'numeric',
       hour:         'numeric',
       minute:       '2-digit',
+      timeZone:     'America/New_York',
       timeZoneName: 'short',
     }))
   }, [deadline])
