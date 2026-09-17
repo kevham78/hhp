@@ -11,7 +11,7 @@ weekly picks, a suicide pool, standings, payments tracking, and automated emails
 |-------------|----------------------------------------------|
 | Frontend    | Next.js 15 (App Router) + React 18            |
 | Styling     | Tailwind CSS + Radix UI                       |
-| Auth        | NextAuth v5 (Google OAuth + email/password)   |
+| Auth        | NextAuth v5 (email/password, invite-only)     |
 | Database    | PostgreSQL + Prisma ORM                       |
 | Email       | Resend                                        |
 | NHL Data    | Unofficial NHL API (api-web.nhle.com)         |
@@ -73,8 +73,6 @@ Copy `.env.example` to `.env.local` and fill in:
 | `DATABASE_URL`         | PostgreSQL connection string                              |
 | `NEXTAUTH_SECRET`      | Random secret (run `openssl rand -base64 32`)              |
 | `NEXTAUTH_URL`         | Your app URL                                              |
-| `GOOGLE_CLIENT_ID`     | From Google Cloud Console                                 |
-| `GOOGLE_CLIENT_SECRET` | From Google Cloud Console                                 |
 | `RESEND_API_KEY`       | From the Resend dashboard (emails log to console if unset) |
 | `EMAIL_FROM`           | Sender email address                                      |
 | `EMAIL_FROM_NAME`      | Sender display name                                       |
@@ -130,7 +128,7 @@ src/
 │   ├── email/           # Resend client + email templates
 │   └── cron/            # Scheduler + auto-pick job
 ├── types/               # TypeScript types
-└── auth.ts              # NextAuth config (Google + Credentials providers)
+└── auth.ts              # NextAuth config (Credentials provider, invite-only registration)
 
 prisma/
 ├── schema.prisma        # Data model (users, seasons, weeks, games, picks, suicide pool, payments, stats, etc.)

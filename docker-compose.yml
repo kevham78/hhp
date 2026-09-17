@@ -40,8 +40,6 @@ services:
       DATABASE_URL: postgresql://hhp_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/hhp_db
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-https://hhp.kevinhamilton.ca}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       RESEND_API_KEY: ${RESEND_API_KEY}
       EMAIL_FROM: ${EMAIL_FROM}
       EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-Hicks Hockey Pool}

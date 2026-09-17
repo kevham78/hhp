@@ -20,7 +20,7 @@ model User {
   email             String    @unique
   emailVerified     DateTime?
   image             String?
-  password          String?   // hashed, null if Google login
+  password          String?   // hashed
   role              Role      @default(PLAYER)
   isActive          Boolean   @default(true)
   notifyByEmail     Boolean   @default(true)

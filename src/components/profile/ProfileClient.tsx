@@ -290,7 +290,7 @@ export default function ProfileClient({
       {!hasPassword && (
         <div className="hhp-card">
           <p className="text-white/40 text-sm text-center">
-            You signed in with Google — password management is handled by Google.
+            No password set for this account.
           </p>
         </div>
       )}

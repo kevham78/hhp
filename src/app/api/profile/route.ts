@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
       if (!user?.password) {
         return NextResponse.json(
-          { error: 'Cannot change password for Google accounts' },
+          { error: 'No password set for this account' },
           { status: 400 }
         )
       }
