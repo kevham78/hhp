@@ -3,18 +3,16 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-// TODO: replace the placeholder "@example.com" emails below with each
-// player's real email address before seeding a shared environment.
 const PLAYERS = [
   { name: 'Wayne',    email: 'waynehicks2000@yahoo.com', role: 'ADMIN'  },
   { name: 'Kevin',    email: 'kevyham@gmail.com',         role: 'ADMIN'  },
-  { name: 'Andrew',   email: 'andrew@example.com',        role: 'PLAYER' },
-  { name: 'Clifford', email: 'clifford@example.com',      role: 'PLAYER' },
-  { name: 'Jon',      email: 'jon@example.com',           role: 'PLAYER' },
-  { name: 'Mike',     email: 'mike@example.com',          role: 'PLAYER' },
-  { name: 'Perry',    email: 'perry@example.com',         role: 'PLAYER' },
-  { name: 'Phillip',  email: 'phillip@example.com',       role: 'PLAYER' },
-  { name: 'Tyler',    email: 'tyler@example.com',         role: 'PLAYER' },
+  { name: 'Andrew',   email: 'korn75@gmail.com',          role: 'PLAYER' },
+  { name: 'Clifford', email: 'cliff.hicks@outlook.com',   role: 'PLAYER' },
+  { name: 'Jon',      email: 'jon.hicks12@gmail.com',     role: 'PLAYER' },
+  { name: 'Mike',     email: 'mikehall_77@hotmail.com',   role: 'PLAYER' },
+  { name: 'Perry',    email: 'pjcornforth@outlook.com',   role: 'PLAYER' },
+  { name: 'Phillip',  email: 'phimp@videotron.ca',        role: 'PLAYER' },
+  { name: 'Tyler',    email: 'ty.hicks77@yahoo.com',      role: 'PLAYER' },
 ]
 
 async function main() {
