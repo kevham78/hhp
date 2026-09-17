@@ -46,7 +46,6 @@ export default async function AdminDashboardPage() {
         where:   { seasonId: season.id },
         include: { user: true },
         orderBy: { totalPoints: 'desc' },
-        take:    5,
       })
     : []
 
