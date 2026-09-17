@@ -3,6 +3,11 @@ import { formatInTimeZone } from 'date-fns-tz'
 const NHL_API = 'https://api-web.nhle.com/v1'
 const EASTERN_TZ = 'America/New_York'
 
+// NHL API gameType: 1 = preseason, 2 = regular season, 3 = playoffs.
+// Preseason is included so a short pre-launch test season (using
+// preseason weekends) can be run before the real regular season.
+const PICKABLE_GAME_TYPES = [1, 2]
+
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
@@ -155,7 +160,7 @@ async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
     if (!dayEntry) return []
 
     return (dayEntry.games || [])
-      .filter((g: NHLGameFromAPI) => g.gameType === 2)
+      .filter((g: NHLGameFromAPI) => PICKABLE_GAME_TYPES.includes(g.gameType))
       .filter((g: NHLGameFromAPI) => toEasternDateStr(new Date(g.startTimeUTC)) === dateStr)
   } catch (err) {
     console.error(`Failed to fetch NHL schedule for ${dateStr}:`, err)
@@ -212,7 +217,7 @@ async function getResultsForDate(date: Date): Promise<NHLGameResult[]> {
     if (!dayEntry) return []
 
     return (dayEntry.games || [])
-      .filter((g: any) => g.gameType === 2)
+      .filter((g: any) => PICKABLE_GAME_TYPES.includes(g.gameType))
       .filter((g: any) => {
         return toEasternDateStr(new Date(g.startTimeUTC)) === dateStr
       })

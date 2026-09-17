@@ -15,6 +15,24 @@ const PLAYERS = [
   { name: 'Tyler',    email: 'ty.hicks77@yahoo.com',      role: 'PLAYER' },
 ]
 
+const SEASONS = [
+  {
+    // 2-week test run using the two preseason weekends before the real
+    // season, so the pool can be exercised with real players end-to-end
+    // before the real Oct 3 opening weekend.
+    id:        'season-2026-preseason-test',
+    name:      '2026 Preseason Test',
+    startDate: new Date('2026-09-19T00:00:00.000Z'),
+    endDate:   new Date('2026-09-27T23:59:59.000Z'),
+  },
+  {
+    id:        'season-2026-27',
+    name:      '2026-27',
+    startDate: new Date('2026-09-29T00:00:00.000Z'),
+    endDate:   new Date('2027-04-10T23:59:59.000Z'),
+  },
+]
+
 async function main() {
   console.log('🌱 Seeding HHP database...')
 
@@ -65,48 +83,50 @@ async function main() {
   })
   console.log('✅ Settings created')
 
-  const season = await prisma.season.upsert({
-  where:  { id: 'season-2026-27' },
-  update: {},
-  create: {
-    id:        'season-2026-27',
-    name:      '2026-27',
-    startDate: new Date('2026-09-29T00:00:00.000Z'),
-    endDate:   new Date('2027-04-10T23:59:59.000Z'),
-    isActive:  false,
-  },
-})
-  console.log(`✅ Season created: ${season.name}`)
-
-  for (const user of users) {
-    await prisma.seasonStat.upsert({
-      where:  { userId_seasonId: { userId: user.id, seasonId: season.id } },
-      update: {},
-      create: { userId: user.id, seasonId: season.id },
-    })
-    await prisma.suicideStatus.upsert({
-      where:  { userId_seasonId: { userId: user.id, seasonId: season.id } },
+  for (const s of SEASONS) {
+    const season = await prisma.season.upsert({
+      where:  { id: s.id },
       update: {},
       create: {
-        userId:          user.id,
-        seasonId:        season.id,
-        winnerTeamsUsed: [],
-        loserTeamsUsed:  [],
+        id:        s.id,
+        name:      s.name,
+        startDate: s.startDate,
+        endDate:   s.endDate,
+        isActive:  false,
       },
     })
+    console.log(`✅ Season created: ${season.name}`)
+
+    for (const user of users) {
+      await prisma.seasonStat.upsert({
+        where:  { userId_seasonId: { userId: user.id, seasonId: season.id } },
+        update: {},
+        create: { userId: user.id, seasonId: season.id },
+      })
+      await prisma.suicideStatus.upsert({
+        where:  { userId_seasonId: { userId: user.id, seasonId: season.id } },
+        update: {},
+        create: {
+          userId:          user.id,
+          seasonId:        season.id,
+          winnerTeamsUsed: [],
+          loserTeamsUsed:  [],
+        },
+      })
+    }
+
+    await prisma.suicidePoolState.upsert({
+      where:  { poolType_seasonId: { poolType: 'WINNER', seasonId: season.id } },
+      update: {},
+      create: { poolType: 'WINNER', seasonId: season.id, currentPot: 0, isActive: true },
+    })
+
+    await prisma.suicidePoolState.upsert({
+      where:  { poolType_seasonId: { poolType: 'LOSER', seasonId: season.id } },
+      update: {},
+      create: { poolType: 'LOSER', seasonId: season.id, currentPot: 0, isActive: true },
+    })
   }
-
-  await prisma.suicidePoolState.upsert({
-    where:  { poolType_seasonId: { poolType: 'WINNER', seasonId: season.id } },
-    update: {},
-    create: { poolType: 'WINNER', seasonId: season.id, currentPot: 0, isActive: true },
-  })
-
-  await prisma.suicidePoolState.upsert({
-    where:  { poolType_seasonId: { poolType: 'LOSER', seasonId: season.id } },
-    update: {},
-    create: { poolType: 'LOSER', seasonId: season.id, currentPot: 0, isActive: true },
-  })
 
   console.log('')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
