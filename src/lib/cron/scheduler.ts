@@ -1,4 +1,5 @@
 import cron from 'node-cron'
+import { formatInTimeZone } from 'date-fns-tz'
 import { prisma } from '@/lib/db/prisma'
 import { runAutoPick } from './autopick'
 import { sendEmail } from '@/lib/email/client'
@@ -7,6 +8,16 @@ import {
   picksRevealEmail,
   commissionerNudgeEmail,
 } from '@/lib/email/templates'
+
+const EASTERN_TZ = 'America/New_York'
+
+// ─────────────────────────────────────────────
+// Format a UTC date as Eastern time for emails
+// ─────────────────────────────────────────────
+
+function formatEasternDateTime(date: Date): string {
+  return formatInTimeZone(date, EASTERN_TZ, 'EEEE, MMM d, h:mm a zzz')
+}
 
 // ─────────────────────────────────────────────
 // Convert day name + time to cron expression
@@ -21,10 +32,26 @@ const DAY_MAP: Record<string, number> = {
 function toCron(day: string, time: string): string {
   const dayNum          = DAY_MAP[day] ?? 5
   const [hours, minutes] = time.split(':').map(Number)
-  // Convert EST to UTC (EST = UTC-5, EDT = UTC-4)
-  // We use UTC-5 as a conservative offset
-  const utcHours = (hours + 5) % 24
-  return `${minutes} ${utcHours} * * ${dayNum}`
+  // node-cron's `timezone` option (set to 'America/Toronto' below)
+  // already converts these fields from Eastern wall-clock time — do
+  // NOT also convert to UTC here. Doing both was double-converting,
+  // shifting every scheduled job by another 4-5 hours.
+  return `${minutes} ${hours} * * ${dayNum}`
+}
+
+// ─────────────────────────────────────────────
+// Don't run weekly jobs for a week whose games
+// are still more than 7 days out — otherwise,
+// starting the season weeks before the first
+// real game weekend fires reminder/deadline/
+// auto-pick jobs (and locks picks) long before
+// there's anything to pick.
+// ─────────────────────────────────────────────
+
+function isWithinJobWindow(week: { saturdayDate: Date }): boolean {
+  const sevenDaysBefore = new Date(week.saturdayDate)
+  sevenDaysBefore.setUTCDate(sevenDaysBefore.getUTCDate() - 7)
+  return new Date() >= sevenDaysBefore
 }
 
 // ─────────────────────────────────────────────
@@ -53,6 +80,10 @@ async function sendReminders(isSecondReminder: boolean) {
     console.log('[Cron] No active week — skipping reminders')
     return
   }
+  if (!isWithinJobWindow(week)) {
+    console.log(`[Cron] Week ${week.weekNumber}'s games are more than 7 days out — skipping reminders`)
+    return
+  }
 
   const allPlayers = await prisma.user.findMany({
     where: { isActive: true },
@@ -69,15 +100,7 @@ async function sendReminders(isSecondReminder: boolean) {
 
   console.log(`[Cron] Sending ${isSecondReminder ? 'second' : 'first'} reminder to ${pending.length} players`)
 
-  const deadline = new Date(week.picksDeadline).toLocaleString('en-CA', {
-    weekday:      'long',
-    month:        'short',
-    day:          'numeric',
-    hour:         'numeric',
-    minute:       '2-digit',
-    timeZone:     'America/Toronto',
-    timeZoneName: 'short',
-  })
+  const deadline = formatEasternDateTime(week.picksDeadline)
 
   for (const player of pending) {
     if (!player.email || !player.notifyByEmail) continue
@@ -109,6 +132,10 @@ async function runDeadlineJob() {
   const week = await getActiveWeek()
   if (!week) {
     console.log('[Cron] No active week — skipping deadline job')
+    return
+  }
+  if (!isWithinJobWindow(week)) {
+    console.log(`[Cron] Week ${week.weekNumber}'s games are more than 7 days out — skipping deadline job`)
     return
   }
 
@@ -150,6 +177,10 @@ async function runCommissionerNudge() {
   const week = await getActiveWeek()
   if (!week) {
     console.log('[Cron] No active week — skipping nudge')
+    return
+  }
+  if (!isWithinJobWindow(week)) {
+    console.log(`[Cron] Week ${week.weekNumber}'s games are more than 7 days out — skipping nudge`)
     return
   }
 

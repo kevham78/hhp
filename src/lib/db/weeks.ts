@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/db/prisma'
-import { getUpcomingWeekend, getWeekendGames, easternOffsetHours } from '@/lib/api/nhl'
+import { getUpcomingWeekend, getWeekendGames } from '@/lib/api/nhl'
+import { fromZonedTime } from 'date-fns-tz'
+
+const EASTERN_TZ = 'America/New_York'
 
 // ─────────────────────────────────────────────
 // Get the target weekend — either the upcoming
@@ -128,12 +131,14 @@ function getPicksDeadline(saturday: Date, timeEastern: string): Date {
     saturday.getUTCMonth(),
     saturday.getUTCDate() - 1,
   ))
-  const [hours, minutes] = timeEastern.split(':').map(Number)
-  // Convert the Eastern wall-clock time to UTC, accounting for DST —
-  // a hardcoded EST (+5) offset made the Friday 2pm deadline show up
-  // as 3pm during EDT.
-  friday.setUTCHours(hours + easternOffsetHours(friday), minutes, 0, 0)
-  return friday
+  const y = friday.getUTCFullYear()
+  const m = String(friday.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(friday.getUTCDate()).padStart(2, '0')
+
+  // Convert the Eastern wall-clock deadline time to its correct UTC
+  // instant, accounting for DST — a hardcoded EST (+5) offset made a
+  // 2pm deadline show up as 3pm during EDT.
+  return fromZonedTime(`${y}-${m}-${d}T${timeEastern}:00`, EASTERN_TZ)
 }
 
 export function isPicksWindowOpen(week: { picksDeadline: Date }): boolean {

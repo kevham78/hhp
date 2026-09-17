@@ -1,4 +1,7 @@
+import { formatInTimeZone } from 'date-fns-tz'
+
 const NHL_API = 'https://api-web.nhle.com/v1'
+const EASTERN_TZ = 'America/New_York'
 
 // ─────────────────────────────────────────────
 // Types
@@ -49,27 +52,16 @@ export type TeamStanding = {
 // ─────────────────────────────────────────────
 // Eastern Time helpers
 //
-// Docker's Alpine Linux Node build lacks full ICU timezone data, so
-// Intl/toLocaleString with a `timeZone` option is unreliable there.
-// Everywhere this app needs to know "what Eastern calendar date does
-// this UTC instant fall on", it uses this manual offset instead.
-// (Approximates DST as March–November; exact enough for the NHL
-// season, which runs October–June.)
+// node:20-alpine (used in production) ships with full ICU, so real
+// IANA timezone conversion via date-fns-tz works reliably — verified
+// directly against the image. Everywhere this app needs to know "what
+// Eastern calendar date does this UTC instant fall on" (or vice
+// versa), it goes through this instead of hand-rolled UTC-offset math,
+// which can't precisely track the real DST transition dates.
 // ─────────────────────────────────────────────
 
-export function easternOffsetHours(date: Date): number {
-  const month = date.getUTCMonth()
-  const isEDT = month >= 2 && month <= 10
-  return isEDT ? 4 : 5
-}
-
 export function toEasternDateStr(date: Date): string {
-  const offsetMs = easternOffsetHours(date) * 60 * 60 * 1000
-  const eastern  = new Date(date.getTime() - offsetMs)
-  const y = eastern.getUTCFullYear()
-  const m = String(eastern.getUTCMonth() + 1).padStart(2, '0')
-  const d = String(eastern.getUTCDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
+  return formatInTimeZone(date, EASTERN_TZ, 'yyyy-MM-dd')
 }
 
 // ─────────────────────────────────────────────
@@ -104,9 +96,12 @@ export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
     }
   }
 
-  const now         = new Date()
-  const easternNow  = new Date(now.getTime() - easternOffsetHours(now) * 60 * 60 * 1000)
-  const dayOfWeek   = easternNow.getUTCDay()
+  // "Today" as an Eastern calendar date, represented as a UTC-midnight
+  // Date so downstream code (formatDate, DB storage) can keep treating
+  // it as an abstract calendar date via UTC getters.
+  const [y, m, d] = toEasternDateStr(new Date()).split('-').map(Number)
+  const todayEastern = new Date(Date.UTC(y, m - 1, d))
+  const dayOfWeek    = todayEastern.getUTCDay()
 
   let daysUntilSat: number
   if (dayOfWeek === 6) {
@@ -118,9 +113,9 @@ export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
   }
 
   const saturday = new Date(Date.UTC(
-    easternNow.getUTCFullYear(),
-    easternNow.getUTCMonth(),
-    easternNow.getUTCDate() + daysUntilSat,
+    todayEastern.getUTCFullYear(),
+    todayEastern.getUTCMonth(),
+    todayEastern.getUTCDate() + daysUntilSat,
   ))
   const sunday = new Date(Date.UTC(
     saturday.getUTCFullYear(),
@@ -283,7 +278,7 @@ export function getGameLabel(game: NHLGameFromAPI, pickedTeam: string): string {
 
   const day = new Date(game.startTimeUTC).toLocaleDateString('en-US', {
     weekday: 'short',
-    timeZone: 'America/New_York',
+    timeZone: EASTERN_TZ,
   })
 
   const opponent = game.awayTeam.abbrev === pickedTeam
