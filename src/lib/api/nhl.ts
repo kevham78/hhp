@@ -100,6 +100,7 @@ export function getUpcomingWeekend(): { saturday: Date; sunday: Date } {
 
 async function getGamesForDate(date: Date): Promise<NHLGameFromAPI[]> {
   const dateStr = formatDate(date)
+  console.log('[NHL] getGamesForDate called for:', dateStr)
 
   try {
     const res = await fetch(`${NHL_API}/schedule/${dateStr}`, {
