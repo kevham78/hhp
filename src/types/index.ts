@@ -8,11 +8,12 @@ export type UserRole = 'PLAYER' | 'ADMIN'
 declare module 'next-auth' {
   interface Session {
     user: {
-      id:    string
-      email: string
-      name:  string
-      image: string
-      role:  UserRole
+      id:                 string
+      email:              string
+      name:               string
+      image:              string
+      role:               UserRole
+      mustChangePassword: boolean
     }
   }
 }

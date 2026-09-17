@@ -3,10 +3,11 @@ import { NextResponse } from 'next/server'
 
 export default auth((req) => {
   const { nextUrl, auth: session } = req
-  const isLoggedIn   = !!session
-  const isAuthPage   = nextUrl.pathname.startsWith('/login') ||
-                       nextUrl.pathname.startsWith('/register')
-  const isApiAuth    = nextUrl.pathname.startsWith('/api/auth')
+  const isLoggedIn         = !!session
+  const isAuthPage         = nextUrl.pathname.startsWith('/login') ||
+                             nextUrl.pathname.startsWith('/register')
+  const isApiAuth          = nextUrl.pathname.startsWith('/api/auth')
+  const isChangePasswordPage = nextUrl.pathname.startsWith('/change-password')
 
   if (isApiAuth) return NextResponse.next()
   if (isLoggedIn && isAuthPage) return NextResponse.redirect(new URL('/picks', nextUrl))
@@ -14,6 +15,12 @@ export default auth((req) => {
     const loginUrl = new URL('/login', nextUrl)
     loginUrl.searchParams.set('callbackUrl', nextUrl.pathname)
     return NextResponse.redirect(loginUrl)
+  }
+  if (isLoggedIn && session.user.mustChangePassword && !isChangePasswordPage) {
+    return NextResponse.redirect(new URL('/change-password', nextUrl))
+  }
+  if (isLoggedIn && !session.user.mustChangePassword && isChangePasswordPage) {
+    return NextResponse.redirect(new URL('/picks', nextUrl))
   }
   return NextResponse.next()
 })

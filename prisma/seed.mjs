@@ -3,40 +3,46 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
+// TODO: replace the placeholder "@example.com" emails below with each
+// player's real email address before seeding a shared environment.
+const PLAYERS = [
+  { name: 'Wayne',    email: 'waynehicks2000@yahoo.com', role: 'ADMIN'  },
+  { name: 'Kevin',    email: 'kevyham@gmail.com',         role: 'ADMIN'  },
+  { name: 'Andrew',   email: 'andrew@example.com',        role: 'PLAYER' },
+  { name: 'Clifford', email: 'clifford@example.com',      role: 'PLAYER' },
+  { name: 'Jon',      email: 'jon@example.com',           role: 'PLAYER' },
+  { name: 'Mike',     email: 'mike@example.com',          role: 'PLAYER' },
+  { name: 'Perry',    email: 'perry@example.com',         role: 'PLAYER' },
+  { name: 'Phillip',  email: 'phillip@example.com',       role: 'PLAYER' },
+  { name: 'Tyler',    email: 'tyler@example.com',         role: 'PLAYER' },
+]
+
 async function main() {
   console.log('🌱 Seeding HHP database...')
 
-  const adminPassword = await bcrypt.hash('hockey', 12)
+  const tempPassword = await bcrypt.hash('hockey', 12)
 
-  const wayne = await prisma.user.upsert({
-    where:  { email: 'waynehicks2000@yahoo.com' },
-    update: {},
-    create: {
-      email:    'waynehicks2000@yahoo.com',
-      name:     'Wayne',
-      password: adminPassword,
-      role:     'ADMIN',
-      isActive: true,
-      notifyByEmail: true,
-      notifyInApp:   true,
-    },
-  })
-  console.log(`✅ Created: ${wayne.name} (${wayne.email})`)
+  const users = []
+  for (const p of PLAYERS) {
+    const user = await prisma.user.upsert({
+      where:  { email: p.email },
+      update: {},
+      create: {
+        email:              p.email,
+        name:               p.name,
+        password:           tempPassword,
+        mustChangePassword: true,
+        role:               p.role,
+        isActive:           true,
+        notifyByEmail:      true,
+        notifyInApp:        true,
+      },
+    })
+    users.push(user)
+    console.log(`✅ Created: ${user.name} (${user.email}) [${user.role}]`)
+  }
 
-  const kevin = await prisma.user.upsert({
-    where:  { email: 'kevyham@gmail.com' },
-    update: {},
-    create: {
-      email:    'kevyham@gmail.com',
-      name:     'Kevin',
-      password: adminPassword,
-      role:     'ADMIN',
-      isActive: true,
-      notifyByEmail: true,
-      notifyInApp:   true,
-    },
-  })
-  console.log(`✅ Created: ${kevin.name} (${kevin.email})`)
+  const wayne = users[0]
 
   const settings = await prisma.settings.upsert({
     where:  { id: 'default' },
@@ -74,7 +80,7 @@ async function main() {
 })
   console.log(`✅ Season created: ${season.name}`)
 
-  for (const user of [wayne, kevin]) {
+  for (const user of users) {
     await prisma.seasonStat.upsert({
       where:  { userId_seasonId: { userId: user.id, seasonId: season.id } },
       update: {},
@@ -107,7 +113,8 @@ async function main() {
   console.log('')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('🏒 HHP database seeded successfully!')
-  console.log('   Temp password for both admins: hockey')
+  console.log('   Temp password for all players: hockey')
+  console.log('   Everyone must set a new password on first login.')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
 

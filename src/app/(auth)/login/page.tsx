@@ -1,15 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
+  const [passwordChanged, setPasswordChanged] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    setPasswordChanged(new URLSearchParams(window.location.search).get('passwordChanged') === '1')
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,6 +41,11 @@ export default function LoginPage() {
         </div>
         <div className="hhp-card hhp-gold-border">
           <h2 className="text-xl font-bold text-white mb-6 text-center">Sign In</h2>
+          {passwordChanged && !error && (
+            <div className="mb-4 p-3 rounded-lg bg-green-500/15 border border-green-500/30 text-sm text-green-300">
+              Password updated. Sign in with your new password.
+            </div>
+          )}
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-red-500/15 border border-red-500/30 text-sm text-red-300">
               {error}

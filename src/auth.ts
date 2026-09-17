@@ -38,11 +38,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   if (!passwordMatch) return null
 
   return {
-    id:    user.id,
-    email: user.email,
-    name:  user.name,
-    role:  user.role,
-    image: user.image,
+    id:                 user.id,
+    email:              user.email,
+    name:               user.name,
+    role:               user.role,
+    image:              user.image,
+    mustChangePassword: user.mustChangePassword,
   }
 },
     }),
@@ -50,15 +51,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id   = user.id
-        token.role = (user as any).role
+        token.id                 = user.id
+        token.role               = (user as any).role
+        token.mustChangePassword = (user as any).mustChangePassword
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id   = token.id as string
-        session.user.role = token.role as UserRole
+        session.user.id                 = token.id as string
+        session.user.role               = token.role as UserRole
+        session.user.mustChangePassword = token.mustChangePassword as boolean
       }
       return session
     },
