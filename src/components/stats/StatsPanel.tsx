@@ -7,6 +7,7 @@ import { GameStats, TeamStandingInfo } from '@/lib/api/nhlStats'
 interface StatsPanelProps {
   homeCode: string
   awayCode: string
+  gameType: number
   onClose:  () => void
 }
 
@@ -66,17 +67,20 @@ function TeamStats({ team, isHome }: { team: TeamStandingInfo; isHome: boolean }
   )}
 </div>
 
-      {/* Conference + Division rank */}
-      <div className="space-y-1 mb-3">
-        <div className={`flex items-center gap-1.5 ${isHome ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-white/40 text-xs">{team.conferenceName}</span>
-          <span className="text-white text-xs font-bold">#{team.conferenceRank}</span>
+      {/* Conference + Division rank — not meaningful for preseason or
+          schedule-computed records, so hidden when there's no rank */}
+      {(team.conferenceRank > 0 || team.divisionRank > 0) && (
+        <div className="space-y-1 mb-3">
+          <div className={`flex items-center gap-1.5 ${isHome ? 'justify-end' : 'justify-start'}`}>
+            <span className="text-white/40 text-xs">{team.conferenceName}</span>
+            <span className="text-white text-xs font-bold">#{team.conferenceRank}</span>
+          </div>
+          <div className={`flex items-center gap-1.5 ${isHome ? 'justify-end' : 'justify-start'}`}>
+            <span className="text-white/40 text-xs">{team.divisionName}</span>
+            <span className="text-white text-xs font-bold">#{team.divisionRank}</span>
+          </div>
         </div>
-        <div className={`flex items-center gap-1.5 ${isHome ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-white/40 text-xs">{team.divisionName}</span>
-          <span className="text-white text-xs font-bold">#{team.divisionRank}</span>
-        </div>
-      </div>
+      )}
 
       {/* Last 10 + streak */}
       <div className="space-y-1.5">
@@ -97,7 +101,7 @@ function TeamStats({ team, isHome }: { team: TeamStandingInfo; isHome: boolean }
 // Main panel
 // ─────────────────────────────────────────────
 
-export default function StatsPanel({ homeCode, awayCode, onClose }: StatsPanelProps) {
+export default function StatsPanel({ homeCode, awayCode, gameType, onClose }: StatsPanelProps) {
   const [stats,   setStats]   = useState<GameStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState('')
@@ -107,7 +111,7 @@ export default function StatsPanel({ homeCode, awayCode, onClose }: StatsPanelPr
       setLoading(true)
       setError('')
       try {
-        const res  = await fetch(`/api/stats?home=${homeCode}&away=${awayCode}`)
+        const res  = await fetch(`/api/stats?home=${homeCode}&away=${awayCode}&gameType=${gameType}`)
         const data = await res.json()
         if (!res.ok) throw new Error(data.error)
         setStats(data)
@@ -118,7 +122,7 @@ export default function StatsPanel({ homeCode, awayCode, onClose }: StatsPanelPr
       }
     }
     load()
-  }, [homeCode, awayCode])
+  }, [homeCode, awayCode, gameType])
 
   return (
     <>
@@ -167,7 +171,7 @@ export default function StatsPanel({ homeCode, awayCode, onClose }: StatsPanelPr
               {/* Team stats side by side */}
               <div>
                 <p className="text-white/30 text-xs uppercase tracking-widest mb-3 text-center">
-                  Season Stats
+                  {gameType === 1 ? 'Preseason Stats' : 'Season Stats'}
                 </p>
                 <div className="flex gap-4 items-start">
                   <TeamStats team={stats.awayTeam} isHome={false} />
@@ -185,7 +189,7 @@ export default function StatsPanel({ homeCode, awayCode, onClose }: StatsPanelPr
               {/* Head to head */}
               <div>
                 <p className="text-white/30 text-xs uppercase tracking-widest mb-3 text-center">
-                  Head to Head — 2025-26
+                  Head to Head — {stats.seasonLabel}
                 </p>
 
                 {stats.headToHead.length === 0 ? (

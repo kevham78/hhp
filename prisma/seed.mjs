@@ -38,6 +38,12 @@ async function main() {
 
   const tempPassword = await bcrypt.hash('hockey', 12)
 
+  // Note: `update: {}` below means re-running this seed NEVER changes
+  // an existing user's password — only brand-new accounts get the temp
+  // password. That's intentional (a reseed should never clobber a real
+  // password someone has already set), but it means resetting an
+  // *existing* account back to the temp password needs a separate,
+  // explicit step: `npm run db:reset-passwords -- <email>`.
   const users = []
   for (const p of PLAYERS) {
     const user = await prisma.user.upsert({

@@ -10,8 +10,9 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url)
-    const home = searchParams.get('home')
-    const away = searchParams.get('away')
+    const home     = searchParams.get('home')
+    const away     = searchParams.get('away')
+    const gameType = parseInt(searchParams.get('gameType') ?? '2', 10)
 
     if (!home || !away) {
       return NextResponse.json(
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
       )
     }
 
-    const stats = await getGameStats(home, away)
+    const stats = await getGameStats(home, away, gameType)
 
     if (!stats) {
       return NextResponse.json(

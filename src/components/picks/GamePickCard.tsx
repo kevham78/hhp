@@ -7,7 +7,7 @@ interface GamePickCardProps {
   game:         NHLGameFromAPI
   selectedTeam: string | null
   onPick:       (gameId: string, teamCode: string) => void
-  onInfo:       (homeCode: string, awayCode: string) => void
+  onInfo:       (homeCode: string, awayCode: string, gameType: number) => void
   isLocked:     boolean
 }
 
@@ -77,7 +77,7 @@ export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLoc
 
       {/* Info button */}
       <button
-        onClick={() => onInfo(homeCode, awayCode)}
+        onClick={() => onInfo(homeCode, awayCode, game.gameType)}
         className="flex-shrink-0 w-7 h-7 rounded-full border border-hhp-navy-light
                    text-white hover:text-hhp-gold hover:border-hhp-gold/40
                    flex items-center justify-center text-xs transition-colors"

@@ -62,10 +62,10 @@ export default function PicksClient({
   const [formattedDeadline, setFormattedDeadline] = useState('')
   const [formattedSatDate, setFormattedSatDate] = useState('')
   const [formattedSunDate, setFormattedSunDate] = useState('')
-  const [statsGame, setStatsGame] = useState<{ home: string; away: string } | null>(null)
+  const [statsGame, setStatsGame] = useState<{ home: string; away: string; gameType: number } | null>(null)
 
-function handleOpenStats(homeCode: string, awayCode: string) {
-  setStatsGame({ home: homeCode, away: awayCode })
+function handleOpenStats(homeCode: string, awayCode: string, gameType: number) {
+  setStatsGame({ home: homeCode, away: awayCode, gameType })
 }
 
   useEffect(() => {
@@ -399,6 +399,7 @@ function handleRandomPicks() {
   <StatsPanel
     homeCode={statsGame.home}
     awayCode={statsGame.away}
+    gameType={statsGame.gameType}
     onClose={() => setStatsGame(null)}
   />
 )}

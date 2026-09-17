@@ -70,6 +70,26 @@ export function toEasternDateStr(date: Date): string {
 }
 
 // ─────────────────────────────────────────────
+// Current NHL season code, e.g. "20262027"
+//
+// NHL seasons run roughly October-June and are labeled by their
+// starting year. Before July, "this season" is still the one that
+// started the previous calendar year (covers the summer off-season).
+// ─────────────────────────────────────────────
+
+export function getCurrentNHLSeasonCode(date: Date = new Date()): string {
+  const [year, month] = toEasternDateStr(date).split('-').map(Number)
+  const startYear = month >= 7 ? year : year - 1
+  return `${startYear}${startYear + 1}`
+}
+
+export function formatSeasonLabel(seasonCode: string): string {
+  const startYear = seasonCode.slice(0, 4)
+  const endYear   = seasonCode.slice(6, 8)
+  return `${startYear}-${endYear}`
+}
+
+// ─────────────────────────────────────────────
 // Format date as YYYY-MM-DD
 //
 // `date` is expected to be a UTC-midnight-normalized "calendar date"
