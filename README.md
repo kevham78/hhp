@@ -1,22 +1,23 @@
 # 🏒 Hicks Hockey Pool (HHP)
 
 A full-featured NHL hockey pool app for the Hicks family —
-weekly picks, suicide pools, standings, and automated emails.
+weekly picks, a suicide pool, standings, payments tracking, and automated emails.
 
 ---
 
 ## Tech Stack
 
-| Layer       | Technology                        |
-|-------------|-----------------------------------|
-| Frontend    | Next.js 14 (App Router) + React   |
-| Styling     | Tailwind CSS + Radix UI           |
-| Auth        | NextAuth v5 (Email + Google)      |
-| Database    | PostgreSQL + Prisma ORM           |
-| Email       | SendGrid                          |
-| NHL Data    | Unofficial NHL API (free)         |
-| Hosting     | Docker on Synology DS1621+        |
-| Domain      | hhp.kevinhamilton.ca (GoDaddy)    |
+| Layer       | Technology                                  |
+|-------------|----------------------------------------------|
+| Frontend    | Next.js 15 (App Router) + React 18            |
+| Styling     | Tailwind CSS + Radix UI                       |
+| Auth        | NextAuth v5 (Google OAuth + email/password)   |
+| Database    | PostgreSQL + Prisma ORM                       |
+| Email       | Resend                                        |
+| NHL Data    | Unofficial NHL API (api-web.nhle.com)         |
+| Scheduling  | node-cron (separate container)                |
+| Hosting     | Docker on Synology DS1621+                    |
+| Domain      | hhp.kevinhamilton.ca (GoDaddy)                |
 
 ---
 
@@ -67,21 +68,25 @@ Open [http://localhost:3000](http://localhost:3000)
 
 Copy `.env.example` to `.env.local` and fill in:
 
-| Variable              | Description                          |
-|-----------------------|--------------------------------------|
-| `DATABASE_URL`        | PostgreSQL connection string         |
-| `NEXTAUTH_SECRET`     | Random secret (run `openssl rand -base64 32`) |
-| `NEXTAUTH_URL`        | Your app URL                         |
-| `GOOGLE_CLIENT_ID`    | From Google Cloud Console            |
-| `GOOGLE_CLIENT_SECRET`| From Google Cloud Console            |
-| `SENDGRID_API_KEY`    | From SendGrid dashboard              |
-| `EMAIL_FROM`          | Sender email address                 |
+| Variable               | Description                                              |
+|------------------------|-----------------------------------------------------------|
+| `DATABASE_URL`         | PostgreSQL connection string                              |
+| `NEXTAUTH_SECRET`      | Random secret (run `openssl rand -base64 32`)              |
+| `NEXTAUTH_URL`         | Your app URL                                              |
+| `GOOGLE_CLIENT_ID`     | From Google Cloud Console                                 |
+| `GOOGLE_CLIENT_SECRET` | From Google Cloud Console                                 |
+| `RESEND_API_KEY`       | From the Resend dashboard (emails log to console if unset) |
+| `EMAIL_FROM`           | Sender email address                                      |
+| `EMAIL_FROM_NAME`      | Sender display name                                       |
+| `NEXT_PUBLIC_APP_URL`  | Public app URL (used in emails/links)                      |
+| `NEXT_PUBLIC_APP_NAME` | Public app name                                           |
+| `TZ`                   | Timezone for scheduled tasks (`America/Toronto`)           |
+| `NHL_API_BASE_URL`     | NHL API base URL (no key required)                         |
+| `NHL_STATS_API_URL`    | NHL stats API base URL (no key required)                   |
 
 ---
 
 ## Synology Deployment
-
-See `/docs/synology-setup.md` for full deployment guide.
 
 Quick start:
 ```bash
@@ -93,6 +98,11 @@ cp .env.example .env
 docker compose up -d
 ```
 
+`docker-compose.yml` runs three services:
+- **postgres** — PostgreSQL 16
+- **app** — the Next.js app (standalone build, runs `prisma migrate deploy` on start)
+- **cron** — a separate lightweight container (`Dockerfile.cron`) running the scheduled jobs in `src/lib/cron`
+
 ---
 
 ## Project Structure
@@ -100,39 +110,47 @@ docker compose up -d
 ```
 src/
 ├── app/
-│   ├── (auth)/          # Login, register, invite pages
-│   ├── (dashboard)/     # Main app pages (picks, results, etc.)
-│   ├── api/             # API routes
+│   ├── (auth)/          # Login, register pages
+│   ├── (dashboard)/     # Main app pages: picks, results, standings, payments, profile, admin
+│   ├── api/             # API routes (auth, picks, standings, stats, payments, profile, admin, cron)
 │   └── layout.tsx       # Root layout
 ├── components/
-│   ├── ui/              # Base UI components
+│   ├── ui/              # Base UI components (Radix-based)
 │   ├── picks/           # Weekly picks components
 │   ├── stats/           # Team stats side panel
-│   ├── suicide/         # Suicide pool components
+│   ├── standings/       # Standings components
+│   ├── results/         # Weekly/monthly results components
+│   ├── payments/        # Payment tracking components
+│   ├── profile/         # User profile components
 │   ├── admin/           # Commissioner tools
-│   ├── notifications/   # In-app notifications
 │   └── layout/          # Nav, header, sidebar
 ├── lib/
 │   ├── db/              # Prisma client
 │   ├── api/             # NHL API client
-│   ├── email/           # SendGrid email templates
-│   ├── cron/            # Scheduled jobs
-│   └── utils/           # Helpers, formatters
+│   ├── email/           # Resend client + email templates
+│   └── cron/            # Scheduler + auto-pick job
 ├── types/               # TypeScript types
-└── auth.ts              # NextAuth config
+└── auth.ts              # NextAuth config (Google + Credentials providers)
+
+prisma/
+├── schema.prisma        # Data model (users, seasons, weeks, games, picks, suicide pool, payments, stats, etc.)
+├── migrations/          # Prisma migrations
+└── seed.mjs             # Seed script
 ```
 
 ---
 
-## Weekly Schedule (EST)
+## Weekly Schedule (Eastern time)
 
-| Time               | Event                                      |
-|--------------------|--------------------------------------------|
-| Monday 9am         | Results email sent to all players          |
-| Thursday 3pm       | First reminder email (picks not submitted) |
-| Friday 8am         | Second reminder email                      |
-| Friday 2pm         | Picks locked, auto-pick fires, reveal email |
-| Saturday / Sunday  | Games played                               |
+| Time               | Event                                        |
+|--------------------|-----------------------------------------------|
+| Monday 9am         | Results email sent to all players             |
+| Thursday 3pm       | First reminder email (picks not submitted)     |
+| Friday 8am         | Second reminder email                          |
+| Friday 2pm         | Picks locked, auto-pick fires, reveal email    |
+| Saturday / Sunday  | Games played                                   |
+
+Scheduled jobs live in `src/lib/cron` and run in the dedicated `cron` container.
 
 ---
 

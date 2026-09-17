@@ -42,7 +42,7 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL:-https://hhp.kevinhamilton.ca}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY}
       EMAIL_FROM: ${EMAIL_FROM}
       EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-Hicks Hockey Pool}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://hhp.kevinhamilton.ca}
@@ -69,7 +69,7 @@ services:
         condition: service_started
     environment:
       DATABASE_URL: postgresql://hhp_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/hhp_db
-      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY}
       EMAIL_FROM: ${EMAIL_FROM}
       EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-Hicks Hockey Pool}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://hhp.kevinhamilton.ca}

@@ -155,12 +155,10 @@ async function handleInvite(body: any, adminId: string) {
 
   const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/register?token=${invite.token}&email=${encodeURIComponent(email)}`
 
-  // Send email if SendGrid is configured
-  if (process.env.SENDGRID_API_KEY &&
-      process.env.SENDGRID_API_KEY !== 'your-sendgrid-api-key') {
+  // Send email if Resend is configured
+  if (process.env.RESEND_API_KEY &&
+      process.env.RESEND_API_KEY !== 'your-resend-api-key') {
     try {
-      const sgMail = await import('@sendgrid/mail')
-      sgMail.default.setApiKey(process.env.SENDGRID_API_KEY)
       const { sendEmail }  = await import('@/lib/email/client')
       const { inviteEmail } = await import('@/lib/email/templates')
 
@@ -184,8 +182,8 @@ async function handleInvite(body: any, adminId: string) {
   return NextResponse.json({
     success:   true,
     inviteUrl,
-    emailSent: !!process.env.SENDGRID_API_KEY &&
-               process.env.SENDGRID_API_KEY !== 'your-sendgrid-api-key',
+    emailSent: !!process.env.RESEND_API_KEY &&
+               process.env.RESEND_API_KEY !== 'your-resend-api-key',
     message:   'Invite sent successfully!',
   })
 }
