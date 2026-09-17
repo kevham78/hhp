@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding HHP database...')
 
-  const adminPassword = await bcrypt.hash('ChangeMe123!', 12)
+  const adminPassword = await bcrypt.hash('hockey', 12)
 
   const wayne = await prisma.user.upsert({
     where:  { email: 'waynehicks2000@yahoo.com' },
@@ -107,7 +107,7 @@ async function main() {
   console.log('')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('🏒 HHP database seeded successfully!')
-  console.log('   Temp password for both admins: ChangeMe123!')
+  console.log('   Temp password for both admins: hockey')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
 
