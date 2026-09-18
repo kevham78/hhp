@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/picks')
+  if (!session || session.user.role !== 'ADMIN') redirect('/standings')
 
   const season = await prisma.season.findFirst({
     where: { isActive: true },

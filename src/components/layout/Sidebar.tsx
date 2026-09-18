@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Trophy, DollarSign, BarChart3, Settings, Users, ShieldCheck, Menu, X } from 'lucide-react'
+import { Trophy, DollarSign, BarChart3, Settings, Users, ShieldCheck, Menu, X, Skull } from 'lucide-react'
 import HHPLogo from './HHPLogo'
 import clsx from 'clsx'
 import { useState } from 'react'
@@ -17,9 +17,10 @@ function PuckIcon({ className }: { className?: string }) {
 }
 
 const playerNav = [
-  { href: '/picks',        label: 'My Picks',  icon: PuckIcon },
-  { href: '/results/week', label: 'Results',   icon: Trophy },
   { href: '/standings',    label: 'Standings', icon: BarChart3 },
+  { href: '/picks',        label: 'My Picks',  icon: PuckIcon },
+  { href: '/suicide',      label: 'Suicide Pool', icon: Skull },
+  { href: '/results/week', label: 'Results',   icon: Trophy },
   { href: '/payments',     label: 'Money',     icon: DollarSign },
 ]
 

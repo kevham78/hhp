@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminPlayersPage() {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/picks')
+  if (!session || session.user.role !== 'ADMIN') redirect('/standings')
 
   return (
     <div className="space-y-6">

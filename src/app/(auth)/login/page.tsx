@@ -7,13 +7,16 @@ import { useRouter } from 'next/navigation'
 export default function LoginPage() {
   const router = useRouter()
   const [passwordChanged, setPasswordChanged] = useState(false)
+  const [registered, setRegistered] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    setPasswordChanged(new URLSearchParams(window.location.search).get('passwordChanged') === '1')
+    const params = new URLSearchParams(window.location.search)
+    setPasswordChanged(params.get('passwordChanged') === '1')
+    setRegistered(params.get('registered') === '1')
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -27,7 +30,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError('Invalid email or password.')
     } else {
-      router.push('/picks')
+      router.push('/standings')
       router.refresh()
     }
   }
@@ -44,6 +47,11 @@ export default function LoginPage() {
           {passwordChanged && !error && (
             <div className="mb-4 p-3 rounded-lg bg-green-500/15 border border-green-500/30 text-sm text-green-300">
               Password updated. Sign in with your new password.
+            </div>
+          )}
+          {registered && !error && (
+            <div className="mb-4 p-3 rounded-lg bg-green-500/15 border border-green-500/30 text-sm text-green-300">
+              Account created! Sign in to get started.
             </div>
           )}
           {error && (

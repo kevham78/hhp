@@ -1,7 +1,7 @@
 'use client'
 
 import { signOut } from 'next-auth/react'
-import { Bell, ChevronDown, LogOut, User, Shield } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, User, Shield, HelpCircle } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -52,6 +52,14 @@ export default function TopBar({ user }: TopBarProps) {
                               text-white/70 hover:text-white hover:bg-white/5 transition-colors"
                   >
                     <User className="w-4 h-4" /> My Profile
+                  </Link>
+                  <Link
+                    href="/help"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm
+                              text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <HelpCircle className="w-4 h-4" /> Help
                   </Link>
                   <button onClick={() => signOut({ callbackUrl: '/login' })}
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-white/70 hover:text-hhp-red hover:bg-hhp-red/10 transition-colors">
