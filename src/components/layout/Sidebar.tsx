@@ -38,8 +38,11 @@ export default function Sidebar({ role }: { role: string }) {
   const NavLink = ({ href, label, icon: Icon }: {
     href: string; label: string; icon: any
   }) => {
-    const active = pathname === href ||
-      (href !== '/picks' && pathname.startsWith(href))
+    // Exact match only — a prefix match here would make "/admin"
+    // (Dashboard) light up on "/admin/players" too, since every admin
+    // route is a distinct nav item under the /admin/* prefix rather
+    // than a nested sub-page of Dashboard.
+    const active = pathname === href
     return (
       <Link
         href={href}
