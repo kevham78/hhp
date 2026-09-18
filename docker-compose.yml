@@ -14,8 +14,6 @@ services:
       POSTGRES_DB: hhp_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"   # Remove this in production (only expose internally)
     networks:
       - hhp_network
     healthcheck:
