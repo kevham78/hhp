@@ -37,21 +37,28 @@ export type WeekendGames = {
 }
 
 export type TeamStanding = {
-  teamAbbrev:     { default: string }
-  teamName:       { default: string }
-  teamLogo:       string
-  wins:           number
-  losses:         number
-  otLosses:       number
-  points:         number
-  gamesPlayed:    number
-  l10Wins:        number
-  l10Losses:      number
-  l10OtLosses:    number
-  streakCode:     string
-  streakCount:    number
-  divisionName:   string
-  conferenceName: string
+  teamAbbrev:         { default: string }
+  teamName:           { default: string }
+  teamLogo:           string
+  wins:               number
+  losses:             number
+  otLosses:           number
+  points:             number
+  pointPctg:          number
+  gamesPlayed:        number
+  goalFor:            number
+  goalAgainst:        number
+  goalDifferential:   number
+  l10Wins:            number
+  l10Losses:          number
+  l10OtLosses:        number
+  streakCode:         string
+  streakCount:        number
+  divisionName:       string
+  divisionSequence:   number
+  conferenceName:     string
+  conferenceSequence: number
+  leagueSequence:     number
 }
 
 // ─────────────────────────────────────────────

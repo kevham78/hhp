@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Trophy, DollarSign, BarChart3, Settings, Users, ShieldCheck, Menu, X, Skull } from 'lucide-react'
+import { Trophy, DollarSign, BarChart3, Settings, Users, ShieldCheck, Menu, X, Skull, Table2 } from 'lucide-react'
 import HHPLogo from './HHPLogo'
 import clsx from 'clsx'
 import { useState } from 'react'
@@ -22,6 +22,7 @@ const playerNav = [
   { href: '/suicide',      label: 'Suicide Pool', icon: Skull },
   { href: '/results/week', label: 'Results',   icon: Trophy },
   { href: '/payments',     label: 'Money',     icon: DollarSign },
+  { href: '/nhl-standings', label: 'NHL Standings', icon: Table2 },
 ]
 
 const adminNav = [
