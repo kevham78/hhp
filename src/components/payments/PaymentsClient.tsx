@@ -28,6 +28,7 @@ interface PlayerFinancial {
 interface PaymentsData {
   seasonId:         string
   completedWeeks:   number
+  weeksOwed:        number
   weeklyDues:       number
   playerFinancials: PlayerFinancial[]
   monthlyStandings: PlayerFinancial[]
@@ -241,7 +242,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                       {player.name}
                     </p>
                     <p className="text-white/30 text-xs">
-                      {data.completedWeeks} weeks ×
+                      {data.weeksOwed} weeks ×
                       ${data.weeklyDues} = ${player.duesOwed.toFixed(2)} dues
                     </p>
                   </div>
@@ -267,13 +268,15 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                     </p>
                   </div>
 
-                  {/* Log payment button — admin only */}
-                  {isAdmin && owes && (
+                  {/* Log payment button — admin only, always available so
+                      funds can be logged even if the player's tracked
+                      balance is even (e.g. paying ahead) */}
+                  {isAdmin && (
                     <button
                       onClick={e => {
                         e.stopPropagation()
                         setPayingPlayer(player)
-                        setPayAmount(player.netBalance.toFixed(2))
+                        setPayAmount(owes ? player.netBalance.toFixed(2) : '')
                         setShowPayment(true)
                       }}
                       className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5

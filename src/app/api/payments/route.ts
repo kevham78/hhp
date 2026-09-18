@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db/prisma'
+import { getDuesOwedTime } from '@/lib/db/weeks'
 import { z } from 'zod'
 
 const logPaymentSchema = z.object({
@@ -33,13 +34,26 @@ export async function GET() {
       where: { id: 'default' },
     })
 
-    // Count completed weeks this season
+    // Count completed weeks this season (used for "weeks played" display
+    // and the monthly pot, which are tied to real, scored results)
     const completedWeeks = await prisma.week.count({
       where: {
         seasonId: season.id,
         status:   'COMPLETED',
       },
     })
+
+    // Dues owed is separate from "completed" — it starts accruing
+    // Friday morning of each week, regardless of whether the
+    // commissioner has gotten around to entering that week's results
+    // yet. Otherwise dues can lag real participation by days or weeks.
+    const allWeeks = await prisma.week.findMany({
+      where:  { seasonId: season.id },
+      select: { saturdayDate: true },
+    })
+    const weeksOwed = allWeeks.filter(
+      w => new Date() >= getDuesOwedTime(w.saturdayDate)
+    ).length
 
     // Get all active players
     const players = await prisma.user.findMany({
@@ -114,8 +128,8 @@ export async function GET() {
     const weeklyDues = settings?.weeklyDues ?? 5
 
     const playerFinancials = players.map(player => {
-      // Total dues owed based on completed weeks
-      const duesOwed = completedWeeks * weeklyDues
+      // Total dues owed — accrues from Friday morning of each week
+      const duesOwed = weeksOwed * weeklyDues
 
       // Total winnings from payments table
       const winnings = allPayments
@@ -183,6 +197,7 @@ export async function GET() {
     return NextResponse.json({
       seasonId:         season.id,
       completedWeeks,
+      weeksOwed,
       weeklyDues,
       playerFinancials,
       monthlyStandings,

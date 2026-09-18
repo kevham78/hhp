@@ -123,9 +123,12 @@ export async function getOrCreateCurrentWeek() {
   })
 }
 
-function getPicksDeadline(saturday: Date, timeEastern: string): Date {
-  // saturday is a UTC-midnight-normalized calendar date — use UTC
-  // arithmetic to get "the day before" without shifting timezones.
+// Convert a Friday-of-the-week + Eastern wall-clock time into its
+// correct UTC instant. `saturday` is a UTC-midnight-normalized
+// calendar date, so UTC arithmetic gets "the day before" without
+// shifting timezones; date-fns-tz then handles the DST-aware
+// Eastern -> UTC conversion for the time itself.
+function fridayAtEasternTime(saturday: Date, timeEastern: string): Date {
   const friday = new Date(Date.UTC(
     saturday.getUTCFullYear(),
     saturday.getUTCMonth(),
@@ -135,10 +138,17 @@ function getPicksDeadline(saturday: Date, timeEastern: string): Date {
   const m = String(friday.getUTCMonth() + 1).padStart(2, '0')
   const d = String(friday.getUTCDate()).padStart(2, '0')
 
-  // Convert the Eastern wall-clock deadline time to its correct UTC
-  // instant, accounting for DST — a hardcoded EST (+5) offset made a
-  // 2pm deadline show up as 3pm during EDT.
   return fromZonedTime(`${y}-${m}-${d}T${timeEastern}:00`, EASTERN_TZ)
+}
+
+function getPicksDeadline(saturday: Date, timeEastern: string): Date {
+  return fridayAtEasternTime(saturday, timeEastern)
+}
+
+// Dues for a week start accruing Friday morning of that week —
+// separate from the picks deadline (which is Friday afternoon).
+export function getDuesOwedTime(saturday: Date): Date {
+  return fridayAtEasternTime(saturday, '08:00')
 }
 
 export function isPicksWindowOpen(week: { picksDeadline: Date }): boolean {
