@@ -94,6 +94,7 @@ model InviteToken {
   id        String    @id @default(cuid())
   token     String    @unique @default(cuid())
   email     String
+  name      String
   createdBy String
   createdAt DateTime  @default(now())
   expiresAt DateTime

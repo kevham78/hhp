@@ -13,6 +13,10 @@ const toggleSchema = z.object({
   isActive: z.boolean(),
 })
 
+const cancelInviteSchema = z.object({
+  inviteId: z.string(),
+})
+
 // ─────────────────────────────────────────────
 // GET /api/admin/players
 // List all players with their season stats
@@ -72,7 +76,21 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json({ players, currentWeek })
+    // Outstanding invites — sent but not yet registered
+    const invites = await prisma.inviteToken.findMany({
+      where:   { usedAt: null, expiresAt: { gt: new Date() } },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    const pendingInvites = invites.map(invite => ({
+      id:        invite.id,
+      name:      invite.name,
+      email:     invite.email,
+      invitedAt: invite.createdAt,
+      expiresAt: invite.expiresAt,
+    }))
+
+    return NextResponse.json({ players, pendingInvites, currentWeek })
   } catch (err) {
     console.error('GET /api/admin/players error:', err)
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
@@ -92,10 +110,11 @@ export async function POST(req: Request) {
     }
 
     const body   = await req.json()
-    const action = body.action as 'invite' | 'toggle'
+    const action = body.action as 'invite' | 'toggle' | 'cancel-invite'
 
-    if (action === 'invite') return handleInvite(body, session.user.id)
-    if (action === 'toggle') return handleToggle(body)
+    if (action === 'invite')        return handleInvite(body, session.user.id)
+    if (action === 'toggle')        return handleToggle(body)
+    if (action === 'cancel-invite') return handleCancelInvite(body)
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   } catch (err) {
@@ -148,6 +167,7 @@ async function handleInvite(body: any, adminId: string) {
   const invite = await prisma.inviteToken.create({
     data: {
       email,
+      name,
       createdBy: adminId,
       expiresAt,
     },
@@ -204,6 +224,21 @@ async function handleToggle(body: any) {
     where: { id: userId },
     data:  { isActive },
   })
+
+  return NextResponse.json({ success: true })
+}
+
+// ─────────────────────────────────────────────
+// Cancel a pending invite
+// ─────────────────────────────────────────────
+
+async function handleCancelInvite(body: any) {
+  const parsed = cancelInviteSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
+  }
+
+  await prisma.inviteToken.delete({ where: { id: parsed.data.inviteId } })
 
   return NextResponse.json({ success: true })
 }

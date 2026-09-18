@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { UserPlus, Shield, User, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { UserPlus, Shield, User, CheckCircle, Clock, XCircle, Mail } from 'lucide-react'
 
 interface Player {
   id:            string
@@ -17,8 +17,17 @@ interface Player {
   currentWeekId: string | null
 }
 
+interface PendingInvite {
+  id:        string
+  name:      string
+  email:     string
+  invitedAt: string
+  expiresAt: string
+}
+
 export default function PlayersClient() {
-  const [players,  setPlayers]  = useState<Player[]>([])
+  const [players,        setPlayers]        = useState<Player[]>([])
+  const [pendingInvites, setPendingInvites]  = useState<PendingInvite[]>([])
   const [loading,  setLoading]  = useState(true)
   const [error,    setError]    = useState('')
   const [showInvite, setShowInvite] = useState(false)
@@ -43,10 +52,25 @@ export default function PlayersClient() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       setPlayers(data.players)
+      setPendingInvites(data.pendingInvites ?? [])
     } catch (err: any) {
       setError(err.message || 'Failed to load players')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleCancelInvite(inviteId: string) {
+    try {
+      const res = await fetch('/api/admin/players', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'cancel-invite', inviteId }),
+      })
+      if (!res.ok) throw new Error('Failed to cancel invite')
+      setPendingInvites(prev => prev.filter(i => i.id !== inviteId))
+    } catch (err: any) {
+      setError(err.message)
     }
   }
 
@@ -69,6 +93,7 @@ export default function PlayersClient() {
       setInviteResult(data)
       setInviteName('')
       setInviteEmail('')
+      await loadPlayers()
     } catch (err: any) {
       setInviteResult({
         success: false,
@@ -219,6 +244,39 @@ export default function PlayersClient() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Pending invites */}
+      {pendingInvites.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-white/30 text-xs font-semibold uppercase tracking-widest">
+            Pending Invites
+          </p>
+          {pendingInvites.map(invite => (
+            <div key={invite.id} className="hhp-card flex items-center gap-4 border-dashed">
+              <div className="w-10 h-10 rounded-full bg-hhp-navy-light border
+                              border-yellow-500/30 flex items-center justify-center
+                              flex-shrink-0">
+                <Mail className="w-4 h-4 text-yellow-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-semibold truncate">{invite.name}</p>
+                <p className="text-white/40 text-xs truncate">{invite.email}</p>
+              </div>
+              <span className="flex items-center gap-1 text-xs text-yellow-400 flex-shrink-0">
+                <Clock className="w-3.5 h-3.5" /> Pending
+              </span>
+              <button
+                onClick={() => handleCancelInvite(invite.id)}
+                className="flex-shrink-0 p-1.5 rounded-lg text-white/30
+                           hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                title="Cancel invite"
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
