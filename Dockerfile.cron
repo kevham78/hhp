@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 RUN npx prisma generate
 
 COPY src/lib ./src/lib
@@ -12,4 +12,4 @@ COPY src/types ./src/types
 COPY src/app/api ./src/app/api
 COPY tsconfig.json ./
 
-CMD ["node", "-r", "ts-node/register", "src/lib/cron/index.ts"]
+CMD ["npx", "tsx", "src/lib/cron/index.ts"]
