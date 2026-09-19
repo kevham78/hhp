@@ -25,8 +25,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Week not found' }, { status: 404 })
     }
 
-    // Only show picks if published
-    if (!week.picksPublished) {
+    // Only show completed weeks — a published-but-not-yet-completed
+    // week (this weekend, in progress) belongs on Weekly Picks instead
+    if (week.status !== 'COMPLETED') {
       return NextResponse.json({
         published: false,
         weekId,

@@ -12,7 +12,7 @@ export default auth((req) => {
   const isChangePasswordPage = nextUrl.pathname.startsWith('/change-password')
 
   if (isApiAuth) return NextResponse.next()
-  if (isLoggedIn && isAuthPage) return NextResponse.redirect(new URL('/standings', nextUrl))
+  if (isLoggedIn && isAuthPage) return NextResponse.redirect(new URL('/weekly-picks', nextUrl))
   if (!isLoggedIn && !isAuthPage) {
     const loginUrl = new URL('/login', nextUrl)
     loginUrl.searchParams.set('callbackUrl', nextUrl.pathname)
@@ -22,7 +22,7 @@ export default auth((req) => {
     return NextResponse.redirect(new URL('/change-password', nextUrl))
   }
   if (isLoggedIn && !session.user.mustChangePassword && isChangePasswordPage) {
-    return NextResponse.redirect(new URL('/standings', nextUrl))
+    return NextResponse.redirect(new URL('/weekly-picks', nextUrl))
   }
   return NextResponse.next()
 })

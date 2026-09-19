@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminSettingsPage() {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/standings')
+  if (!session || session.user.role !== 'ADMIN') redirect('/weekly-picks')
 
   const [settings, seasons, playerCount] = await Promise.all([
     prisma.settings.findFirst({ where: { id: 'default' } }),
@@ -15,7 +15,7 @@ export default async function AdminSettingsPage() {
     prisma.user.count({ where: { isActive: true } }),
   ])
 
-  if (!settings) redirect('/standings')
+  if (!settings) redirect('/weekly-picks')
 
   return (
     <div className="space-y-6">

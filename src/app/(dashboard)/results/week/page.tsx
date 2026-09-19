@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import WeeklyPicksGrid from '@/components/results/WeeklyPicksGrid'
+import ResultsPageClient from '@/components/results/ResultsPageClient'
 import { prisma } from '@/lib/db/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -19,30 +19,31 @@ export default async function WeeklyResultsPage({
     where: { isActive: true },
   })
 
-  // If no weekId provided, find the most recent published week
-  let weekId = weekIdParam
+  // Only completed weeks show up here — a week isn't "done" until the
+  // whole weekend has been played and the commissioner has confirmed it
+  const completedWeeks = season
+    ? await prisma.week.findMany({
+        where:   { seasonId: season.id, status: 'COMPLETED' },
+        orderBy: { weekNumber: 'desc' },
+        select:  { id: true, weekNumber: true },
+      })
+    : []
 
-  if (!weekId && season) {
-    const latestWeek = await prisma.week.findFirst({
-      where: {
-        seasonId:       season.id,
-        picksPublished: true,
-      },
-      orderBy: { weekNumber: 'desc' },
-    })
-    weekId = latestWeek?.id
-  }
+  const weekId = weekIdParam && completedWeeks.some(w => w.id === weekIdParam)
+    ? weekIdParam
+    : completedWeeks[0]?.id
 
   if (!weekId) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-black text-white">Weekly Picks</h1>
+        <h1 className="text-2xl font-black text-white">Results</h1>
         <div className="hhp-card text-center py-16">
           <p className="text-4xl mb-4">⏳</p>
-          <p className="text-white font-bold text-lg">Waiting for submissions</p>
+          <p className="text-white font-bold text-lg">No completed weeks yet</p>
           <p className="text-white/40 text-sm mt-2">
-            Picks will be revealed once everyone has submitted
-            or the Friday deadline passes.
+            Results show up here once a week's games are all played and
+            the commissioner confirms the final scores. Check Weekly
+            Picks for this week's live picks in the meantime.
           </p>
         </div>
       </div>
@@ -50,9 +51,6 @@ export default async function WeeklyResultsPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-black text-white">Weekly Picks</h1>
-      <WeeklyPicksGrid weekId={weekId} />
-    </div>
+    <ResultsPageClient weeks={completedWeeks} initialWeekId={weekId} />
   )
 }

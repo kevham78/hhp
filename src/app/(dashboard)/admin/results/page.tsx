@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminResultsPage() {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/standings')
+  if (!session || session.user.role !== 'ADMIN') redirect('/weekly-picks')
 
   // Get current active week
   const season = await prisma.season.findFirst({ where: { isActive: true } })
