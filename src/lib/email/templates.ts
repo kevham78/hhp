@@ -271,7 +271,39 @@ export function commissionerNudgeEmail({
 }
 
 // ─────────────────────────────────────────────
-// 5. Invite Email (already used in players API)
+// 5. Forgot Password
+// ─────────────────────────────────────────────
+
+export function resetPasswordEmail({
+  name,
+  resetUrl,
+}: {
+  name:     string
+  resetUrl: string
+}): string {
+  const content = `
+    <h1 style="color:#ffffff;font-size:22px;font-weight:900;margin:0 0 8px;">
+      Reset Your Password 🔒
+    </h1>
+    <p style="color:#8899aa;font-size:14px;margin:0 0 20px;">
+      Hi ${name},
+    </p>
+    <p style="color:#ccddee;font-size:15px;margin:0 0 24px;line-height:1.6;">
+      We got a request to reset your Hicks Hockey Pool password.
+      Click below to choose a new one.
+    </p>
+    ${button('Reset Password →', resetUrl)}
+    <p style="color:#8899aa;font-size:13px;text-align:center;margin:16px 0 0;">
+      This link expires in 1 hour. If you didn't request this,
+      you can safely ignore this email.
+    </p>
+  `
+
+  return baseTemplate(content)
+}
+
+// ─────────────────────────────────────────────
+// 6. Invite Email (already used in players API)
 // Keeping here for consistency
 // ─────────────────────────────────────────────
 
