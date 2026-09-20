@@ -256,7 +256,10 @@ async function getResultsForDate(date: Date): Promise<NHLGameResult[]> {
         awayScore:    g.awayTeam.score ?? 0,
         gameState:    g.gameState,
         isLive:       g.gameState === 'LIVE',
-        isFinal:      g.gameState === 'OFF',
+        // NHL reports "FINAL" as soon as the game ends and "OFF" once
+        // the league officially confirms it — sometimes hours later.
+        // Treat either as final rather than waiting on "OFF" alone.
+        isFinal:      g.gameState === 'FINAL' || g.gameState === 'OFF',
       }))
   } catch {
     return []

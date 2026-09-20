@@ -120,7 +120,7 @@ async function computeRecordFromSchedule(
 
     const data = await res.json()
     const games: any[] = (data.games ?? [])
-      .filter((g: any) => g.gameType === gameType && g.gameState === 'OFF')
+      .filter((g: any) => g.gameType === gameType && (g.gameState === 'OFF' || g.gameState === 'FINAL'))
       .sort((a: any, b: any) => a.gameDate.localeCompare(b.gameDate))
 
     const results: ('W' | 'L' | 'OTL')[] = []
