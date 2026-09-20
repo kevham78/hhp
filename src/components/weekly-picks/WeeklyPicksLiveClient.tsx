@@ -8,6 +8,7 @@ interface GameResult {
   homeTeamCode: string
   awayTeamCode: string
   gameDay:      string
+  gameTime:     string
   homeScore:    number | null
   awayScore:    number | null
   winner:       string | null
@@ -89,11 +90,22 @@ function TeamCell({ detail }: { detail: PickDetail | undefined }) {
   )
 }
 
+function formatGameTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-US', {
+    hour:     'numeric',
+    minute:   '2-digit',
+    timeZone: 'America/New_York',
+  })
+}
+
 function GameRow({ game, players }: { game: GameResult; players: PlayerResult[] }) {
   return (
     <tr>
       <td className="py-2 pr-4">
         <div className="flex items-center gap-1.5">
+          <span className="text-white/30 text-xs w-12 flex-shrink-0">
+            {formatGameTime(game.gameTime)}
+          </span>
           <img
             src={`https://assets.nhle.com/logos/nhl/svg/${game.awayTeamCode}_dark.svg`}
             className="w-4 h-4 object-contain"
@@ -108,8 +120,8 @@ function GameRow({ game, players }: { game: GameResult; players: PlayerResult[] 
           />
           <span className="text-white/50 text-xs">{game.homeTeamCode}</span>
           {game.isFinal && (
-            <span className="text-white/30 text-xs ml-1">
-              {game.awayScore}–{game.homeScore}
+            <span className="text-white/40 text-xs ml-1 font-semibold">
+              FINAL {game.awayScore}–{game.homeScore}
             </span>
           )}
           {game.isLive && !game.isFinal && (
