@@ -54,21 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id                 = user.id
         token.role               = (user as any).role
         token.mustChangePassword = (user as any).mustChangePassword
-        return token
       }
-
-      // Revalidate on every request rather than trusting a session
-      // cookie indefinitely — if the underlying user was deleted or
-      // deactivated since login, invalidate the stale session instead
-      // of silently serving empty/wrong data for a dangling user id.
-      // This also keeps role/mustChangePassword in sync without
-      // requiring the player to log out and back in.
-      const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } })
-      if (!dbUser || !dbUser.isActive) return null
-
-      token.role               = dbUser.role
-      token.mustChangePassword = dbUser.mustChangePassword
-
       return token
     },
     async session({ session, token }) {
