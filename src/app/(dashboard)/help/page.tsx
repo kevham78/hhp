@@ -77,6 +77,12 @@ export default async function HelpPage() {
           You'll also get email reminders on {reminder1Day} ({reminder1Time}) and
           {' '}{reminder2Day} morning ({reminder2Time}) if you still have picks left.
         </p>
+        <p>
+          Once locked, <strong className="text-white">My Picks</strong> stays on that
+          week — view-only — until the commissioner confirms results (or they're
+          auto-approved Monday if the commissioner hasn't gotten to it yet). Only
+          then does the page open back up for next week's picks.
+        </p>
       </Section>
 
       <Section icon={Target} title="Phase 1 — Pick Your Winners">
