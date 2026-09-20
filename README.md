@@ -110,7 +110,7 @@ src/
 ├── app/
 │   ├── (auth)/          # Login, register pages
 │   ├── (dashboard)/     # Main app pages: picks, results, standings, payments, profile, admin
-│   ├── api/             # API routes (auth, picks, standings, stats, payments, profile, admin, cron)
+│   ├── api/             # API routes (auth, picks, standings, stats, payments, profile, admin)
 │   └── layout.tsx       # Root layout
 ├── components/
 │   ├── ui/              # Base UI components (Radix-based)
@@ -140,15 +140,23 @@ prisma/
 
 ## Weekly Schedule (Eastern time)
 
-| Time               | Event                                        |
-|--------------------|-----------------------------------------------|
-| Monday 9am         | Results email sent to all players             |
-| Thursday 3pm       | First reminder email (picks not submitted)     |
-| Friday 8am         | Second reminder email                          |
-| Friday 2pm         | Picks locked, auto-pick fires, reveal email    |
-| Saturday / Sunday  | Games played                                   |
+| Time               | Event                                                     |
+|--------------------|-------------------------------------------------------------|
+| Thursday 3pm       | First reminder email (picks not submitted)                  |
+| Friday 8am         | Second reminder email                                       |
+| Friday 2pm         | Picks locked, auto-pick fires, reveal email                 |
+| Saturday / Sunday  | Games played                                                 |
+| Monday 9am         | Nudge email to the commissioner to confirm results           |
+| Monday 11am        | Results auto-approved if the commissioner hasn't confirmed yet |
 
-Scheduled jobs live in `src/lib/cron` and run in the dedicated `cron` container.
+All five times are configurable per-pool from Settings → Email Schedule.
+Scheduled jobs live in `src/lib/cron` and run only in the dedicated
+`cron` container — the app container no longer starts its own copy.
+
+My Picks stays locked (view-only) on the current week's picks until
+results are confirmed — either manually by the commissioner or
+automatically at the Monday deadline above — at which point it opens
+for the next week's picks.
 
 ---
 
