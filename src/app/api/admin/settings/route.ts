@@ -17,6 +17,8 @@ const settingsSchema = z.object({
   reminderTwoTime:    z.string(),
   picksRevealDay:     z.string(),
   picksRevealTime:    z.string(),
+  autoApproveDay:     z.string(),
+  autoApproveTime:    z.string(),
 })
 
 // ─────────────────────────────────────────────

@@ -37,6 +37,22 @@ export async function getOrCreateCurrentWeek() {
   })
   if (!season) return null
 
+  // Don't advance to a new week while a past week's results haven't
+  // been approved yet — keep showing the oldest unresolved one
+  // (locked/view-only via its own picksDeadline) until the
+  // commissioner confirms results or the Monday auto-approve cron
+  // does it for them.
+  const pending = await prisma.week.findFirst({
+    where: {
+      seasonId:   season.id,
+      status:     { not: 'COMPLETED' },
+      sundayDate: { lt: new Date() },
+    },
+    orderBy: { weekNumber: 'asc' },
+    include: { games: true },
+  })
+  if (pending) return pending
+
   const { saturday, sunday } = getTargetWeekend(new Date(season.startDate))
 
   const satStart = new Date(saturday)

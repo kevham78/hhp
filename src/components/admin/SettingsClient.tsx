@@ -18,6 +18,8 @@ interface Settings {
   reminderTwoTime:    string
   picksRevealDay:     string
   picksRevealTime:    string
+  autoApproveDay:     string
+  autoApproveTime:    string
 }
 
 interface Season {
@@ -327,6 +329,12 @@ const splitMatch     = Math.abs(splitTotal - totalCollected) < 0.01
               dayKey:  'picksRevealDay'  as keyof Settings,
               timeKey: 'picksRevealTime' as keyof Settings,
               hint:    'Auto-pick deadline + reveal all picks',
+            },
+            {
+              label:   'Results Auto-Approve',
+              dayKey:  'autoApproveDay'  as keyof Settings,
+              timeKey: 'autoApproveTime' as keyof Settings,
+              hint:    "If results aren't confirmed by this time, they're approved automatically",
             },
           ].map(({ label, dayKey, timeKey, hint }) => (
             <div key={dayKey}>

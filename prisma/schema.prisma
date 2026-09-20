@@ -385,6 +385,8 @@ model Settings {
   reminderTwoTime         String   @default("08:00")
   picksRevealDay          String   @default("Friday")
   picksRevealTime         String   @default("14:00")
+  autoApproveDay          String   @default("Monday")
+  autoApproveTime         String   @default("11:00")
 
   updatedAt               DateTime @updatedAt
   updatedBy               String?

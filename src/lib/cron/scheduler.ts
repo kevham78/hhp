@@ -2,6 +2,7 @@ import cron from 'node-cron'
 import { formatInTimeZone } from 'date-fns-tz'
 import { prisma } from '@/lib/db/prisma'
 import { runAutoPick } from './autopick'
+import { confirmWeekResults } from '@/lib/db/results'
 import { sendEmail } from '@/lib/email/client'
 import {
   picksReminderEmail,
@@ -210,6 +211,55 @@ async function runCommissionerNudge() {
 }
 
 // ─────────────────────────────────────────────
+// Monday auto-approve — if the commissioner
+// hasn't confirmed results by this deadline,
+// approve them automatically so the next
+// week's picks can open. Processes every
+// unresolved past week (oldest first) in case
+// a prior attempt failed (e.g. games not final).
+// ─────────────────────────────────────────────
+
+async function runAutoApprove() {
+  console.log('[Cron] Running results auto-approve')
+
+  const season = await prisma.season.findFirst({
+    where: { isActive: true },
+  })
+  if (!season) {
+    console.log('[Cron] No active season — skipping auto-approve')
+    return
+  }
+
+  const pendingWeeks = await prisma.week.findMany({
+    where: {
+      seasonId:   season.id,
+      status:     { not: 'COMPLETED' },
+      sundayDate: { lt: new Date() },
+    },
+    orderBy: { weekNumber: 'asc' },
+  })
+
+  if (pendingWeeks.length === 0) {
+    console.log('[Cron] No unresolved past weeks — skipping auto-approve')
+    return
+  }
+
+  for (const week of pendingWeeks) {
+    if (!isWithinJobWindow(week)) {
+      console.log(`[Cron] Week ${week.weekNumber}'s games are more than 7 days out — skipping auto-approve`)
+      continue
+    }
+
+    const result = await confirmWeekResults(week.id)
+    if (result.success) {
+      console.log(`[Cron] Auto-approved results for Week ${week.weekNumber}`)
+    } else {
+      console.error(`[Cron] Auto-approve failed for Week ${week.weekNumber}: ${result.error}`)
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
 // Main scheduler — reads settings and starts jobs
 // ─────────────────────────────────────────────
 
@@ -267,6 +317,15 @@ export async function startScheduler() {
     })
   )
   console.log(`[Cron] Sunday nudge scheduled: ${nudgeCron}`)
+
+  // Monday auto-approve
+  const autoApproveCron = toCron(settings.autoApproveDay, settings.autoApproveTime)
+  scheduledJobs.push(
+    cron.schedule(autoApproveCron, () => runAutoApprove(), {
+      timezone: 'America/Toronto',
+    })
+  )
+  console.log(`[Cron] Auto-approve job scheduled: ${autoApproveCron}`)
 
   console.log('[Cron] Scheduler started successfully')
 }
