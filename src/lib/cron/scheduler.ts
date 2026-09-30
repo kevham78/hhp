@@ -1,4 +1,4 @@
-import cron from 'node-cron'
+import cron, { type ScheduledTask } from 'node-cron'
 import { formatInTimeZone } from 'date-fns-tz'
 import { prisma } from '@/lib/db/prisma'
 import { runAutoPick } from './autopick'
@@ -263,7 +263,7 @@ async function runAutoApprove() {
 // Main scheduler — reads settings and starts jobs
 // ─────────────────────────────────────────────
 
-let scheduledJobs: cron.ScheduledTask[] = []
+let scheduledJobs: ScheduledTask[] = []
 
 export async function startScheduler() {
   console.log('[Cron] Starting scheduler...')

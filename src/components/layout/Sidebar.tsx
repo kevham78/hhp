@@ -36,7 +36,9 @@ export default function Sidebar({ role }: { role: string }) {
   const pathname    = usePathname()
   const [open, setOpen] = useState(false)
 
-  const NavLink = ({ href, label, icon: Icon }: {
+  // Plain render helpers (not components) so React doesn't remount the
+  // whole nav on every render of Sidebar.
+  const navLink = ({ href, label, icon: Icon }: {
     href: string; label: string; icon: any
   }) => {
     // Exact match only — a prefix match here would make "/admin"
@@ -46,6 +48,7 @@ export default function Sidebar({ role }: { role: string }) {
     const active = pathname === href
     return (
       <Link
+        key={href}
         href={href}
         onClick={() => setOpen(false)}
         className={clsx(
@@ -62,7 +65,7 @@ export default function Sidebar({ role }: { role: string }) {
     )
   }
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-4 py-5 border-b border-hhp-navy-light">
         <HHPLogo className="w-10 h-10 flex-shrink-0" />
@@ -83,7 +86,7 @@ export default function Sidebar({ role }: { role: string }) {
         <p className="text-white/25 text-xs font-semibold uppercase tracking-widest px-3 mb-2">
           Pool
         </p>
-        {playerNav.map(item => <NavLink key={item.href} {...item} />)}
+        {playerNav.map(navLink)}
 
         {role === 'ADMIN' && (
           <>
@@ -92,7 +95,7 @@ export default function Sidebar({ role }: { role: string }) {
                 Commissioner
               </p>
             </div>
-            {adminNav.map(item => <NavLink key={item.href} {...item} />)}
+            {adminNav.map(navLink)}
           </>
         )}
       </nav>
@@ -111,7 +114,7 @@ export default function Sidebar({ role }: { role: string }) {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-56 bg-hhp-navy-mid
                         border-r border-hhp-navy-light flex-shrink-0">
-        <SidebarContent />
+        {sidebarContent}
       </aside>
 
       {/* Mobile: hamburger button */}
@@ -137,7 +140,7 @@ export default function Sidebar({ role }: { role: string }) {
         <aside className="md:hidden fixed left-0 top-0 bottom-0 w-64
                           bg-hhp-navy-mid border-r border-hhp-navy-light
                           z-50 animate-slide-in-right">
-          <SidebarContent />
+          {sidebarContent}
         </aside>
       )}
     </>
