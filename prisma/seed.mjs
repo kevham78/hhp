@@ -1,7 +1,13 @@
+import { existsSync } from 'node:fs'
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+// Prisma 7 doesn't read .env itself; container env always wins over it.
+if (existsSync('.env')) process.loadEnvFile('.env')
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+})
 
 const PLAYERS = [
   { name: 'Wayne',    email: 'waynehicks2000@yahoo.com', role: 'ADMIN'  },

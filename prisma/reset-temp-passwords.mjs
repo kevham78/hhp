@@ -13,12 +13,18 @@
 //   node prisma/reset-temp-passwords.mjs                    # reset every user
 //   node prisma/reset-temp-passwords.mjs a@x.com b@y.com     # reset just these
 
+import { existsSync } from 'node:fs'
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
 const TEMP_PASSWORD = 'hockey'
 
-const prisma = new PrismaClient()
+// Prisma 7 doesn't read .env itself; container env always wins over it.
+if (existsSync('.env')) process.loadEnvFile('.env')
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+})
 
 async function main() {
   const emails = process.argv.slice(2)
