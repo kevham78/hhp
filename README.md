@@ -62,7 +62,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-Run `npm run lint` (ESLint) and `npx tsc --noEmit` (type-check) before committing — neither runs as part of `next build`.
+Run `npm run lint` (ESLint) before committing — Next 16 no longer lints during `next build` (it still type-checks).
 
 ---
 
