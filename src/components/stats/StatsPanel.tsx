@@ -177,7 +177,7 @@ export default function StatsPanel({ homeCode, awayCode, gameType, onClose }: St
                   <TeamStats team={stats.awayTeam} isHome={false} />
 
                   {/* VS divider */}
-                  <div className="flex flex-col items-center gap-1 pt-3 flex-shrink-0">
+                  <div className="flex flex-col items-center gap-1 pt-3 shrink-0">
                     <span className="text-white/20 text-xs font-bold">VS</span>
                     <div className="w-px h-32 bg-hhp-navy-light" />
                   </div>
@@ -206,7 +206,7 @@ export default function StatsPanel({ homeCode, awayCode, gameType, onClose }: St
                           className="flex items-center gap-2 p-2.5 rounded-lg bg-hhp-navy border border-hhp-navy-light text-sm"
                         >
                           {/* Date */}
-                          <span className="text-white/30 text-xs w-20 flex-shrink-0">
+                          <span className="text-white/30 text-xs w-20 shrink-0">
                             {new Date(game.date + 'T12:00:00Z').toLocaleDateString(undefined, {
                               month: 'short',
                               day:   'numeric',
@@ -219,7 +219,7 @@ export default function StatsPanel({ homeCode, awayCode, gameType, onClose }: St
                           </span>
 
                           {/* Score */}
-                          <span className="text-white font-black text-sm flex-shrink-0">
+                          <span className="text-white font-black text-sm shrink-0">
                             {game.awayScore} – {game.homeScore}
                           </span>
 

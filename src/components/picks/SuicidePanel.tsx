@@ -68,7 +68,7 @@ function TeamButton({
       <img
         src={`https://assets.nhle.com/logos/nhl/svg/${team}_dark.svg`}
         alt={team}
-        className="w-5 h-5 object-contain flex-shrink-0"
+        className="w-5 h-5 object-contain shrink-0"
         onError={e => (e.currentTarget.style.display = 'none')}
       />
       <div className="flex flex-col items-start min-w-0">
@@ -76,10 +76,10 @@ function TeamButton({
         <span className="text-xs opacity-50 leading-tight">{label}</span>
       </div>
       {isUsedBefore && (
-        <span className="ml-auto text-xs opacity-40 flex-shrink-0">used</span>
+        <span className="ml-auto text-xs opacity-40 shrink-0">used</span>
       )}
       {isSelected && (
-        <span className={`ml-auto flex-shrink-0 ${checkColor}`}>✓</span>
+        <span className={`ml-auto shrink-0 ${checkColor}`}>✓</span>
       )}
     </button>
   )

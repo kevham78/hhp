@@ -102,11 +102,11 @@ const splitMatch     = Math.abs(splitTotal - totalCollected) < 0.01
 
   const inputClass = `w-full bg-hhp-navy border border-hhp-navy-light rounded-lg
                       px-4 py-2.5 text-white
-                      focus:outline-none focus:border-hhp-gold/50 transition-colors`
+                      focus:outline-hidden focus:border-hhp-gold/50 transition-colors`
 
   const selectClass = `bg-hhp-navy border border-hhp-navy-light rounded-lg
                        px-3 py-2 text-white text-sm
-                       focus:outline-none focus:border-hhp-gold/50 transition-colors`
+                       focus:outline-hidden focus:border-hhp-gold/50 transition-colors`
 
   return (
     <div className="space-y-6">
@@ -118,7 +118,7 @@ const splitMatch     = Math.abs(splitTotal - totalCollected) < 0.01
         </h2>
 
         <div className="flex items-center gap-3 p-3 rounded-lg bg-hhp-navy border border-hhp-navy-light">
-          <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
             activeSeason ? 'bg-green-400 animate-pulse' : 'bg-white/20'
           }`} />
           <div>
@@ -162,7 +162,7 @@ const splitMatch     = Math.abs(splitTotal - totalCollected) < 0.01
           ) : (
             <div className="p-4 rounded-lg bg-hhp-red/10 border border-hhp-red/30 space-y-3">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 text-hhp-red flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-hhp-red shrink-0 mt-0.5" />
                 <div>
                   <p className="text-white font-bold text-sm">Are you sure?</p>
                   <p className="text-white/60 text-xs mt-1">

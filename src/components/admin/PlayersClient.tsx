@@ -181,7 +181,7 @@ export default function PlayersClient() {
                         <button
                           onClick={() => navigator.clipboard.writeText(inviteResult.inviteUrl!)}
                           className="text-xs px-2 py-1 rounded bg-white/10
-                                     hover:bg-white/20 transition-colors flex-shrink-0"
+                                     hover:bg-white/20 transition-colors shrink-0"
                         >
                           Copy
                         </button>
@@ -206,7 +206,7 @@ export default function PlayersClient() {
                 required
                 className="w-full bg-hhp-navy border border-hhp-navy-light rounded-lg
                            px-4 py-2.5 text-white placeholder-white/25
-                           focus:outline-none focus:border-hhp-gold/50 transition-colors"
+                           focus:outline-hidden focus:border-hhp-gold/50 transition-colors"
               />
             </div>
             <div>
@@ -221,7 +221,7 @@ export default function PlayersClient() {
                 required
                 className="w-full bg-hhp-navy border border-hhp-navy-light rounded-lg
                            px-4 py-2.5 text-white placeholder-white/25
-                           focus:outline-none focus:border-hhp-gold/50 transition-colors"
+                           focus:outline-hidden focus:border-hhp-gold/50 transition-colors"
               />
             </div>
             <div className="flex gap-3">
@@ -257,19 +257,19 @@ export default function PlayersClient() {
             <div key={invite.id} className="hhp-card flex items-center gap-4 border-dashed">
               <div className="w-10 h-10 rounded-full bg-hhp-navy-light border
                               border-yellow-500/30 flex items-center justify-center
-                              flex-shrink-0">
+                              shrink-0">
                 <Mail className="w-4 h-4 text-yellow-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-semibold truncate">{invite.name}</p>
                 <p className="text-white/40 text-xs truncate">{invite.email}</p>
               </div>
-              <span className="flex items-center gap-1 text-xs text-yellow-400 flex-shrink-0">
+              <span className="flex items-center gap-1 text-xs text-yellow-400 shrink-0">
                 <Clock className="w-3.5 h-3.5" /> Pending
               </span>
               <button
                 onClick={() => handleCancelInvite(invite.id)}
-                className="flex-shrink-0 p-1.5 rounded-lg text-white/30
+                className="shrink-0 p-1.5 rounded-lg text-white/30
                            hover:text-red-400 hover:bg-red-400/10 transition-colors"
                 title="Cancel invite"
               >
@@ -292,7 +292,7 @@ export default function PlayersClient() {
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-hhp-navy-light border
                             border-hhp-gold/30 flex items-center justify-center
-                            flex-shrink-0">
+                            shrink-0">
               {player.image ? (
                 <img
                   src={player.image}
@@ -327,7 +327,7 @@ export default function PlayersClient() {
             </div>
 
             {/* Stats */}
-            <div className="hidden sm:flex items-center gap-4 text-center flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-4 text-center shrink-0">
               <div>
                 <p className="text-white font-bold text-sm">{player.totalPoints}</p>
                 <p className="text-white/30 text-xs">pts</p>
@@ -340,7 +340,7 @@ export default function PlayersClient() {
 
             {/* Pick status */}
             {player.currentWeekId && (
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {player.hasPicked ? (
                   <span className="flex items-center gap-1 text-xs text-green-400">
                     <CheckCircle className="w-3.5 h-3.5" /> Picked
@@ -357,7 +357,7 @@ export default function PlayersClient() {
             {player.role !== 'ADMIN' && (
               <button
                 onClick={() => handleToggle(player.id, !player.isActive)}
-                className={`flex-shrink-0 p-1.5 rounded-lg transition-colors ${
+                className={`shrink-0 p-1.5 rounded-lg transition-colors ${
                   player.isActive
                     ? 'text-white/30 hover:text-red-400 hover:bg-red-400/10'
                     : 'text-white/30 hover:text-green-400 hover:bg-green-400/10'

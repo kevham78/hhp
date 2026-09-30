@@ -58,7 +58,7 @@ export default function Sidebar({ role }: { role: string }) {
             : 'text-white/60 hover:text-white hover:bg-white/5'
         )}
       >
-        <Icon className="w-4 h-4 flex-shrink-0" />
+        <Icon className="w-4 h-4 shrink-0" />
         {label}
         {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-hhp-gold" />}
       </Link>
@@ -68,7 +68,7 @@ export default function Sidebar({ role }: { role: string }) {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-4 py-5 border-b border-hhp-navy-light">
-        <HHPLogo className="w-10 h-10 flex-shrink-0" />
+        <HHPLogo className="w-10 h-10 shrink-0" />
         <div>
           <div className="text-white font-black text-sm tracking-wider">HHP</div>
           <div className="text-hhp-gold/60 text-xs">Hicks Hockey Pool</div>
@@ -113,7 +113,7 @@ export default function Sidebar({ role }: { role: string }) {
     <>
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-56 bg-hhp-navy-mid
-                        border-r border-hhp-navy-light flex-shrink-0">
+                        border-r border-hhp-navy-light shrink-0">
         {sidebarContent}
       </aside>
 

@@ -34,7 +34,7 @@ export default function ResultsPageClient({
           onChange={handleChange}
           className="bg-hhp-navy border border-hhp-navy-light rounded-lg
                      px-3 py-2 text-white text-sm
-                     focus:outline-none focus:border-hhp-gold/50 transition-colors"
+                     focus:outline-hidden focus:border-hhp-gold/50 transition-colors"
         >
           {weeks.map(w => (
             <option key={w.id} value={w.id}>Week {w.weekNumber}</option>

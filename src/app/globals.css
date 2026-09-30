@@ -1,6 +1,133 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-hhp-navy: #0a1628;
+  --color-hhp-navy-mid: #0d2347;
+  --color-hhp-navy-light: #1a3a6b;
+  --color-hhp-red: #e8132a;
+  --color-hhp-red-dark: #b00d1f;
+  --color-hhp-gold: #d4a843;
+  --color-hhp-gold-light: #e8c870;
+  --color-hhp-gold-dark: #b8892a;
+  --color-hhp-ice: #c8e8f8;
+  --color-hhp-white: #ffffff;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-fade-in: fade-in 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility hhp-card {
+  @apply bg-hhp-navy-mid border border-hhp-navy-light rounded-xl p-4;
+}
+
+@utility hhp-gold-border {
+  @apply border border-hhp-gold/30;
+}
+
+@utility pick-btn {
+  @apply flex-1 py-2 px-3 rounded-lg border-2 text-sm font-semibold transition-all duration-150 cursor-pointer;
+}
+
+@utility pick-btn-unselected {
+  @apply border-hhp-navy-light bg-hhp-navy text-white/70 hover:border-hhp-gold/50 hover:text-white;
+}
+
+@utility pick-btn-selected {
+  @apply border-hhp-gold bg-hhp-gold/10 text-hhp-gold;
+}
+
+@utility pick-btn-correct {
+  @apply border-green-500 bg-green-500/10 text-green-400;
+}
+
+@utility pick-btn-incorrect {
+  @apply border-red-500 bg-red-500/10 text-red-400;
+}
+
+@utility tiebreaker-badge {
+  @apply inline-flex items-center justify-center w-5 h-5 rounded-full bg-hhp-gold text-hhp-navy text-xs font-black;
+}
+
+@utility status-pill {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+}
+
+@utility status-pill-green {
+  @apply bg-green-500/15 text-green-400;
+}
+
+@utility status-pill-gold {
+  @apply bg-yellow-500/15 text-yellow-400;
+}
+
+@utility status-pill-red {
+  @apply bg-red-500/15 text-red-400;
+}
+
+@utility status-pill-muted {
+  @apply bg-white/10 text-white/50;
+}
 
 @layer base {
   * {
@@ -18,47 +145,4 @@
   ::-webkit-scrollbar-track { background: #0a1628; }
   ::-webkit-scrollbar-thumb { background: #1a3a6b; border-radius: 9999px; }
   ::-webkit-scrollbar-thumb:hover { background: #b8892a; }
-}
-
-@layer components {
-  .hhp-card {
-    @apply bg-hhp-navy-mid border border-hhp-navy-light rounded-xl p-4;
-  }
-
-  .hhp-gold-border {
-    @apply border border-hhp-gold/30;
-  }
-
-  .pick-btn {
-    @apply flex-1 py-2 px-3 rounded-lg border-2 text-sm font-semibold transition-all duration-150 cursor-pointer;
-  }
-
-  .pick-btn-unselected {
-    @apply border-hhp-navy-light bg-hhp-navy text-white/70 hover:border-hhp-gold/50 hover:text-white;
-  }
-
-  .pick-btn-selected {
-    @apply border-hhp-gold bg-hhp-gold/10 text-hhp-gold;
-  }
-
-  .pick-btn-correct {
-    @apply border-green-500 bg-green-500/10 text-green-400;
-  }
-
-  .pick-btn-incorrect {
-    @apply border-red-500 bg-red-500/10 text-red-400;
-  }
-
-  .tiebreaker-badge {
-    @apply inline-flex items-center justify-center w-5 h-5 rounded-full bg-hhp-gold text-hhp-navy text-xs font-black;
-  }
-
-  .status-pill {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .status-pill-green { @apply bg-green-500/15 text-green-400; }
-  .status-pill-gold  { @apply bg-yellow-500/15 text-yellow-400; }
-  .status-pill-red   { @apply bg-red-500/15 text-red-400; }
-  .status-pill-muted { @apply bg-white/10 text-white/50; }
 }

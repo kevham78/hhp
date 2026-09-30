@@ -159,7 +159,7 @@ export default function StandingsClient() {
                     }`}
                   >
                     {/* Rank */}
-                    <div className={`w-6 text-center flex-shrink-0 ${
+                    <div className={`w-6 text-center shrink-0 ${
                       i === 0 ? 'text-hhp-gold font-black' :
                       i === 1 ? 'text-white/60 font-bold' :
                       i === 2 ? 'text-amber-600 font-bold' :
@@ -171,7 +171,7 @@ export default function StandingsClient() {
                     {/* Avatar + name */}
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
                       <div className="w-8 h-8 rounded-full bg-hhp-navy-light
-                                      border border-hhp-gold/30 flex-shrink-0
+                                      border border-hhp-gold/30 shrink-0
                                       flex items-center justify-center">
                         {player.image ? (
                           <img
@@ -193,7 +193,7 @@ export default function StandingsClient() {
                     </div>
 
                     {/* Points */}
-                    <div className="w-16 text-center flex-shrink-0">
+                    <div className="w-16 text-center shrink-0">
                       <span className={`font-black text-lg ${
                         isFirst ? 'text-hhp-gold' : 'text-white'
                       }`}>
@@ -202,14 +202,14 @@ export default function StandingsClient() {
                     </div>
 
                     {/* Weekly wins */}
-                    <div className="w-16 text-center flex-shrink-0">
+                    <div className="w-16 text-center shrink-0">
                       <span className="text-white/70 font-semibold text-sm">
                         {player.weeklyWins}
                       </span>
                     </div>
 
                     {/* Monthly wins */}
-                    <div className="w-20 text-center flex-shrink-0">
+                    <div className="w-20 text-center shrink-0">
                       <span className="text-white/70 font-semibold text-sm">
                         {player.monthlyWins}
                       </span>

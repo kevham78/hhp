@@ -70,7 +70,7 @@ function StandingsTable({ teams, showDivRank }: { teams: Team[]; showDivRank?: b
                   <img
                     src={team.teamLogo}
                     alt={team.teamAbbrev.default}
-                    className="w-6 h-6 object-contain flex-shrink-0"
+                    className="w-6 h-6 object-contain shrink-0"
                     onError={e => (e.currentTarget.style.display = 'none')}
                   />
                   <span className="text-white font-semibold truncate">{team.teamName.default}</span>

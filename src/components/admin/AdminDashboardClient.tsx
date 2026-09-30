@@ -92,7 +92,7 @@ export default function AdminDashboardClient({
       {!season && (
         <div className="hhp-card hhp-gold-border space-y-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-hhp-gold flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-hhp-gold shrink-0 mt-0.5" />
             <div>
               <p className="text-white font-bold">No active season</p>
               <p className="text-white/50 text-sm mt-1">
@@ -106,7 +106,7 @@ export default function AdminDashboardClient({
               value={selectedSeason}
               onChange={e => setSelectedSeason(e.target.value)}
               className="flex-1 bg-hhp-navy border border-hhp-navy-light rounded-lg
-                         px-3 py-2 text-white text-sm focus:outline-none
+                         px-3 py-2 text-white text-sm focus:outline-hidden
                          focus:border-hhp-gold/50 transition-colors"
             >
               {allSeasons.map(s => (
@@ -357,7 +357,7 @@ export default function AdminDashboardClient({
             className="hhp-card flex items-center gap-3 hover:border-hhp-gold/30
                        transition-colors group"
           >
-            <Icon className={`w-5 h-5 ${color} flex-shrink-0`} />
+            <Icon className={`w-5 h-5 ${color} shrink-0`} />
             <div className="min-w-0">
               <p className="text-white font-semibold text-sm group-hover:text-hhp-gold
                             transition-colors">
@@ -365,7 +365,7 @@ export default function AdminDashboardClient({
               </p>
               <p className="text-white/30 text-xs truncate">{sub}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-white/20 ml-auto flex-shrink-0
+            <ChevronRight className="w-4 h-4 text-white/20 ml-auto shrink-0
                                      group-hover:text-hhp-gold/50 transition-colors" />
           </Link>
         ))}

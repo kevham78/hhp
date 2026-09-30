@@ -14,7 +14,7 @@ export default function PhaseBanner({ phase, title, subtitle, complete }: PhaseB
         ? 'border-green-500/30 bg-green-500/5'
         : 'border-hhp-gold/30 bg-hhp-gold/5'
     }`}>
-      <div className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-black text-sm ${
+      <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-black text-sm ${
         complete ? 'bg-green-500/20 text-green-400' : 'bg-hhp-gold/20 text-hhp-gold'
       }`}>
         {complete ? <CheckCircle className="w-5 h-5" /> : phase}

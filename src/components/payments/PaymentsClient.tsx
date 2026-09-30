@@ -229,7 +229,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                 >
                   {/* Avatar */}
                   <div className="w-8 h-8 rounded-full bg-hhp-navy-light
-                                  border border-hhp-gold/30 flex-shrink-0
+                                  border border-hhp-gold/30 shrink-0
                                   flex items-center justify-center">
                     <span className="text-hhp-gold text-xs font-bold">
                       {player.name?.charAt(0).toUpperCase()}
@@ -248,7 +248,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                   </div>
 
                   {/* Balance */}
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className={`font-black text-sm ${
                       even  ? 'text-white/40' :
                       owes  ? 'text-red-400'  : 'text-green-400'
@@ -279,7 +279,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                         setPayAmount(owes ? player.netBalance.toFixed(2) : '')
                         setShowPayment(true)
                       }}
-                      className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5
+                      className="shrink-0 flex items-center gap-1 px-2.5 py-1.5
                                  rounded-lg bg-hhp-gold/15 text-hhp-gold text-xs
                                  font-bold hover:bg-hhp-gold/25 transition-colors"
                     >
@@ -328,7 +328,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                         {player.transactions.map(tx => (
                           <div key={tx.id}
                                className="flex items-center gap-2 text-xs">
-                            <span className="text-white/30 w-20 flex-shrink-0">
+                            <span className="text-white/30 w-20 shrink-0">
                               {new Date(tx.date).toLocaleDateString(undefined, {
                                 month: 'short',
                                 day:   'numeric',
@@ -340,7 +340,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                                 ? ` — Wk ${tx.weekNumber}`
                                 : ''}
                             </span>
-                            <span className={`font-bold flex-shrink-0 ${
+                            <span className={`font-bold shrink-0 ${
                               tx.amount > 0 ? 'text-green-400' : 'text-red-400'
                             }`}>
                               {tx.amount > 0 ? '+' : ''}
@@ -407,7 +407,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                     required
                     className="w-full bg-hhp-navy border border-hhp-navy-light
                                rounded-lg px-4 py-2.5 text-white
-                               focus:outline-none focus:border-hhp-gold/50
+                               focus:outline-hidden focus:border-hhp-gold/50
                                transition-colors"
                   />
                 </div>
@@ -424,7 +424,7 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
                     className="w-full bg-hhp-navy border border-hhp-navy-light
                                rounded-lg px-4 py-2.5 text-white
                                placeholder-white/25
-                               focus:outline-none focus:border-hhp-gold/50
+                               focus:outline-hidden focus:border-hhp-gold/50
                                transition-colors"
                   />
                 </div>

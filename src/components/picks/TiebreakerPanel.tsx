@@ -43,7 +43,7 @@ export default function TiebreakerPanel({
               <img
                 src={`https://assets.nhle.com/logos/nhl/svg/${team}_dark.svg`}
                 alt={team}
-                className="w-6 h-6 object-contain flex-shrink-0"
+                className="w-6 h-6 object-contain shrink-0"
                 onError={e => (e.currentTarget.style.display = 'none')}
               />
               <span className="text-white font-semibold text-sm">{team}</span>
@@ -53,7 +53,7 @@ export default function TiebreakerPanel({
             </div>
 
             {/* Rank buttons */}
-            <div className="flex gap-1.5 flex-shrink-0">
+            <div className="flex gap-1.5 shrink-0">
               {RANKS.map(({ rank, label, color }) => {
                 const isSelected = currentRank === rank
                 const isUsed     = Object.values(tiebreakers).includes(rank) && !isSelected

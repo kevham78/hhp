@@ -71,7 +71,7 @@ export default function LoginPage() {
                 required
                 className="w-full bg-hhp-navy border border-hhp-navy-light rounded-lg
                            px-4 py-2.5 text-white placeholder-white/25
-                           focus:outline-none focus:border-hhp-gold/50 transition-colors"
+                           focus:outline-hidden focus:border-hhp-gold/50 transition-colors"
               />
             </div>
             <div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
                 required
                 className="w-full bg-hhp-navy border border-hhp-navy-light rounded-lg
                            px-4 py-2.5 text-white placeholder-white/25
-                           focus:outline-none focus:border-hhp-gold/50 transition-colors"
+                           focus:outline-hidden focus:border-hhp-gold/50 transition-colors"
               />
             </div>
             <button

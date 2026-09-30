@@ -143,7 +143,7 @@ export default function ResultsClient({ weekId, games }: ResultsClientProps) {
           {preview.anyLive && (
             <div className="p-3 rounded-lg bg-yellow-500/15 border border-yellow-500/30
                             text-sm text-yellow-400 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <AlertCircle className="w-4 h-4 shrink-0" />
               Some games are still in progress. Confirm only when all games are final.
             </div>
           )}
@@ -173,7 +173,7 @@ export default function ResultsClient({ weekId, games }: ResultsClientProps) {
                   </div>
 
                   {/* Score */}
-                  <div className="text-center flex-shrink-0">
+                  <div className="text-center shrink-0">
                     {game.isFinal ? (
                       <span className="text-white font-black">
                         {game.awayScore} – {game.homeScore}

@@ -40,7 +40,7 @@ export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLoc
     <div className="flex items-center gap-2 py-1 border-b border-hhp-navy-light/30 last:border-0">
 
       {/* Time */}
-      <span className="text-white/30 text-xs w-14 flex-shrink-0 text-right">
+      <span className="text-white/30 text-xs w-14 shrink-0 text-right">
         {gameTime}
       </span>
 
@@ -52,14 +52,14 @@ export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLoc
         <img
           src={`https://assets.nhle.com/logos/nhl/svg/${awayCode}_dark.svg`}
           alt={awayCode}
-          className="w-5 h-5 object-contain flex-shrink-0"
+          className="w-5 h-5 object-contain shrink-0"
           onError={e => (e.currentTarget.style.display = 'none')}
         />
         <span className="truncate">{awayCode}</span>
       </button>
 
       {/* @ */}
-      <span className="text-white/20 text-xs flex-shrink-0">@</span>
+      <span className="text-white/20 text-xs shrink-0">@</span>
 
       {/* Home team */}
       <button
@@ -69,7 +69,7 @@ export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLoc
         <img
           src={`https://assets.nhle.com/logos/nhl/svg/${homeCode}_dark.svg`}
           alt={homeCode}
-          className="w-5 h-5 object-contain flex-shrink-0"
+          className="w-5 h-5 object-contain shrink-0"
           onError={e => (e.currentTarget.style.display = 'none')}
         />
         <span className="truncate">{homeCode}</span>
@@ -78,7 +78,7 @@ export default function GamePickCard({ game, selectedTeam, onPick, onInfo, isLoc
       {/* Info button */}
       <button
         onClick={() => onInfo(homeCode, awayCode, game.gameType)}
-        className="flex-shrink-0 w-7 h-7 rounded-full border border-hhp-navy-light
+        className="shrink-0 w-7 h-7 rounded-full border border-hhp-navy-light
                    text-white hover:text-hhp-gold hover:border-hhp-gold/40
                    flex items-center justify-center text-xs transition-colors"
         title="View matchup stats"

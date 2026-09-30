@@ -13,7 +13,7 @@ export default function TopBar({ user }: TopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="h-14 bg-hhp-navy-mid border-b border-hhp-navy-light flex items-center justify-between px-4 md:px-6 flex-shrink-0">
+    <header className="h-14 bg-hhp-navy-mid border-b border-hhp-navy-light flex items-center justify-between px-4 md:px-6 shrink-0">
       <div />
       <div className="flex items-center gap-2">
         <button className="relative p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-colors">

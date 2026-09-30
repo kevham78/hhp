@@ -103,7 +103,7 @@ function GameRow({ game, players }: { game: GameResult; players: PlayerResult[] 
     <tr>
       <td className="py-2 pr-4">
         <div className="flex items-center gap-1.5">
-          <span className="text-white/30 text-xs w-12 flex-shrink-0">
+          <span className="text-white/30 text-xs w-12 shrink-0">
             {formatGameTime(game.gameTime)}
           </span>
           <img
