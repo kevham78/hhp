@@ -1,0 +1,6 @@
+# Keep host build artifacts out of the image (the image installs its own).
+# .env is intentionally NOT ignored: NEXT_PUBLIC_* values are baked in at build time.
+node_modules
+.next
+.git
+tsconfig.tsbuildinfo

@@ -9,10 +9,10 @@ weekly picks, a suicide pool, standings, payments tracking, and automated emails
 
 | Layer       | Technology                                  |
 |-------------|----------------------------------------------|
-| Frontend    | Next.js 15 (App Router) + React 18            |
-| Styling     | Tailwind CSS + Radix UI                       |
+| Frontend    | Next.js 16 (App Router) + React 19            |
+| Styling     | Tailwind CSS 4 + Radix UI                     |
 | Auth        | NextAuth v5 (email/password, invite-only)     |
-| Database    | PostgreSQL + Prisma ORM                       |
+| Database    | PostgreSQL + Prisma ORM 7 (config in `prisma.config.ts`) |
 | Email       | Resend                                        |
 | NHL Data    | Unofficial NHL API (api-web.nhle.com)         |
 | Scheduling  | node-cron (separate container)                |
@@ -61,6 +61,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
+
+Run `npm run lint` (ESLint) and `npx tsc --noEmit` (type-check) before committing — neither runs as part of `next build`.
 
 ---
 
