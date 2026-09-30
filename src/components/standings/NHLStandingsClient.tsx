@@ -10,7 +10,7 @@ interface Team {
   losses:             number
   otLosses:           number
   points:             number
-  pointPctg:          number
+  pointPctg?:         number // omitted by the NHL API until a team has played
   gamesPlayed:        number
   goalFor:            number
   goalAgainst:        number
@@ -18,8 +18,8 @@ interface Team {
   l10Wins:            number
   l10Losses:          number
   l10OtLosses:        number
-  streakCode:         string
-  streakCount:        number
+  streakCode?:        string
+  streakCount?:       number
   divisionName:       string
   divisionSequence:   number
   conferenceName:     string
@@ -34,7 +34,7 @@ const DIVISIONS = [
   { conference: 'Western', division: 'Pacific' },
 ]
 
-function StreakCell({ code, count }: { code: string; count: number }) {
+function StreakCell({ code, count }: { code?: string; count?: number }) {
   if (!code) return <span className="text-white/30">—</span>
   const color = code === 'W' ? 'text-green-400' : code === 'L' ? 'text-red-400' : 'text-white/50'
   return <span className={`font-bold ${color}`}>{code}{count}</span>
@@ -81,7 +81,7 @@ function StandingsTable({ teams, showDivRank }: { teams: Team[]; showDivRank?: b
               <td className="text-center py-2 px-2 text-white/70">{team.losses}</td>
               <td className="text-center py-2 px-2 text-white/70">{team.otLosses}</td>
               <td className="text-center py-2 px-2 text-hhp-gold font-black">{team.points}</td>
-              <td className="text-center py-2 px-2 text-white/50">{team.pointPctg.toFixed(3)}</td>
+              <td className="text-center py-2 px-2 text-white/50">{(team.pointPctg ?? 0).toFixed(3)}</td>
               <td className="text-center py-2 px-2 text-white/50">{team.goalFor}</td>
               <td className="text-center py-2 px-2 text-white/50">{team.goalAgainst}</td>
               <td className={`text-center py-2 px-2 font-semibold ${
