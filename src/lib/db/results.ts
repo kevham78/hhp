@@ -230,11 +230,11 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
       const pick = poolPicks.find(p => p.userId === status.userId)
 
       if (!pick) {
-        // No pick — strike
+        // No pick — knocked out (single elimination)
         const strikes = poolType === 'WINNER'
           ? status.winnerPoolStrikes + 1
           : status.loserPoolStrikes + 1
-        const eliminated = strikes >= 2
+        const eliminated = strikes >= 1
 
         await prisma.suicideStatus.update({
           where: { id: status.id },
@@ -278,11 +278,11 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
           },
         })
       } else {
-        // Wrong — add strike
+        // Wrong — knocked out (single elimination)
         const strikes = poolType === 'WINNER'
           ? status.winnerPoolStrikes + 1
           : status.loserPoolStrikes + 1
-        const eliminated = strikes >= 2
+        const eliminated = strikes >= 1
 
         await prisma.suicideStatus.update({
           where: { id: status.id },

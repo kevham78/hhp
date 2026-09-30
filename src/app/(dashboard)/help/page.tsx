@@ -112,8 +112,8 @@ export default async function HelpPage() {
           <li><strong className="text-white">Loser Pool</strong> — pick one team you picked to LOSE.</li>
         </ul>
         <p>
-          Each pool is <strong className="text-white">double elimination</strong> —
-          two wrong picks and you're out of that pool (being out of one doesn't
+          Each pool is <strong className="text-white">single elimination</strong> —
+          one wrong pick (or a missed pick) and you're out of that pool (being out of one doesn't
           affect the other). You can never pick the same team twice in the same
           pool during the season. Last player standing in each pool takes the
           pot; if everyone still in gets eliminated the same week, the pot

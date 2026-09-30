@@ -5,10 +5,13 @@ import { computeWeekResults } from '@/lib/db/weeklyResults'
 
 // ─────────────────────────────────────────────
 // GET /api/weekly-picks
-// The current (most recently unlocked) week's
-// picks for every player, with live per-game
-// scores/highlights as games finish — open to
-// any logged-in player, not just the commissioner.
+// The current (revealed, not yet processed)
+// week's picks for every player, with live
+// per-game scores/highlights as games finish —
+// open to any logged-in player, not just the
+// commissioner. Once a week is processed it
+// drops off here (it lives on the Results page)
+// until the next week's picks are revealed.
 // ─────────────────────────────────────────────
 
 export async function GET() {
@@ -27,7 +30,7 @@ export async function GET() {
     }
 
     const week = await prisma.week.findFirst({
-      where:   { seasonId: season.id, picksPublished: true },
+      where:   { seasonId: season.id, picksPublished: true, status: 'LOCKED' },
       orderBy: { weekNumber: 'desc' },
     })
 

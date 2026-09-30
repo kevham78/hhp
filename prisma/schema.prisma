@@ -242,7 +242,7 @@ model SuicideStatus {
   userId                String
   seasonId              String
   winnerPoolEliminated  Boolean  @default(false)
-  winnerPoolStrikes     Int      @default(0) // 0, 1, or 2
+  winnerPoolStrikes     Int      @default(0) // 0 or 1 (single elimination)
   loserPoolEliminated   Boolean  @default(false)
   loserPoolStrikes      Int      @default(0)
 
