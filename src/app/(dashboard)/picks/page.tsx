@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { getWeekendGames, getUpcomingWeekend, formatDate } from '@/lib/api/nhl'
-import { getOrCreateCurrentWeek } from '@/lib/db/weeks'
+import { getOrCreateCurrentWeek, addMissingGames } from '@/lib/db/weeks'
 import { prisma } from '@/lib/db/prisma'
 import PicksClient, { PicksState } from '@/components/picks/PicksClient'
 
@@ -53,6 +53,9 @@ const { saturday, sunday } = await getWeekendGames(
   new Date(weekData.saturdayDate),
   new Date(weekData.sundayDate)
 )
+
+// Make sure every game shown here can actually be saved
+await addMissingGames(weekData, saturday, sunday)
 
   if (!weekData) {
     return (

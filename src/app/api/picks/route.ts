@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db/prisma'
-import { getOrCreateCurrentWeek, isPastDeadline } from '@/lib/db/weeks'
+import { getOrCreateCurrentWeek, isPastDeadline, addMissingGames } from '@/lib/db/weeks'
+import { getWeekendGames } from '@/lib/api/nhl'
 import { z } from 'zod'
 
 // ─────────────────────────────────────────────
@@ -109,6 +110,17 @@ if (!isDraft && isPastDeadline(week) && process.env.NODE_ENV !== 'development') 
     { status: 400 }
   )
 }
+
+    // A picked game we don't have yet (NHL added it after the week was
+    // created) — add it from the schedule rather than dropping the pick.
+    const knownGames = new Set(week.games.map(g => g.nhlGameId))
+    if (Object.keys(picks).some(id => !knownGames.has(id))) {
+      const { saturday, sunday } = await getWeekendGames(
+        new Date(week.saturdayDate),
+        new Date(week.sundayDate)
+      )
+      await addMissingGames(week, saturday, sunday)
+    }
 
     const userId      = session.user.id
     const submittedAt = isDraft ? null : new Date()
