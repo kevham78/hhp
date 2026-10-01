@@ -64,6 +64,19 @@ Open [http://localhost:3000](http://localhost:3000)
 
 Run `npm run lint` (ESLint) before committing — Next 16 no longer lints during `next build` (it still type-checks).
 
+### Tests
+
+```bash
+npm test                  # everything
+npm run test:unit         # fast, no database (NHL parsing, dates, rendering)
+npm run test:integration  # real Postgres — needs Docker running
+npm run test:watch        # unit tests, re-run on save
+```
+
+Integration tests start their own throwaway Postgres container (`hhp_vitest_pg`, port 55439) and remove it afterwards. They never read `.env` or `DATABASE_URL`, and refuse to run against anything that isn't a local database with "test" in its name. The NHL API is replaced by recorded responses in `tests/fixtures/nhl`.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, type-check, both test suites and the Docker builds on every push.
+
 ---
 
 ## Environment Variables
