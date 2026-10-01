@@ -40,7 +40,7 @@ function StreakCell({ code, count }: { code?: string; count?: number }) {
   return <span className={`font-bold ${color}`}>{code}{count}</span>
 }
 
-function StandingsTable({ teams, showDivRank }: { teams: Team[]; showDivRank?: boolean }) {
+export function StandingsTable({ teams, showDivRank }: { teams: Team[]; showDivRank?: boolean }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-max text-sm">

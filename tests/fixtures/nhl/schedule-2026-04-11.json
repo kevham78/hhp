@@ -1,0 +1,1567 @@
+{
+ "nextStartDate": "2026-04-18",
+ "previousStartDate": "2026-04-04",
+ "gameWeek": [
+  {
+   "date": "2026-04-11",
+   "dayAbbrev": "SAT",
+   "numberOfGames": 15,
+   "datePromo": [],
+   "games": [
+    {
+     "id": 2025021261,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "TD Garden"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T16:30:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-04:00",
+     "venueTimezone": "US/Eastern",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 384,
+       "market": "N",
+       "countryCode": "US",
+       "network": "ABC",
+       "sequenceNumber": 1
+      },
+      {
+       "id": 289,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SNW",
+       "sequenceNumber": 34
+      }
+     ],
+     "awayTeam": {
+      "id": 14,
+      "commonName": {
+       "default": "Lightning"
+      },
+      "placeName": {
+       "default": "Tampa Bay"
+      },
+      "placeNameWithPreposition": {
+       "default": "Tampa Bay",
+       "fr": "de Tampa Bay"
+      },
+      "abbrev": "TBL",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/TBL_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/TBL_dark.svg",
+      "awaySplitSquad": false,
+      "score": 2
+     },
+     "homeTeam": {
+      "id": 6,
+      "commonName": {
+       "default": "Bruins"
+      },
+      "placeName": {
+       "default": "Boston"
+      },
+      "placeNameWithPreposition": {
+       "default": "Boston",
+       "fr": "de Boston"
+      },
+      "abbrev": "BOS",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg?season=20252026",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/BOS_dark.svg?season=20252026",
+      "homeSplitSquad": false,
+      "score": 1
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8476883,
+      "firstInitial": {
+       "default": "A."
+      },
+      "lastName": {
+       "default": "Vasilevskiy",
+       "cs": "Vasilevskij",
+       "fi": "Vasilevski",
+       "sk": "Vasilevskij"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8482929,
+      "firstInitial": {
+       "default": "E."
+      },
+      "lastName": {
+       "default": "Lilleberg"
+      }
+     },
+     "threeMinRecap": "/video/tbl-at-bos-recap-6392937315112",
+     "threeMinRecapFr": "/fr/video/tbl-vs-bos-11-04-2026-resume-6392935579112",
+     "condensedGame": "/video/tbl-at-bos-condensed-game-6392936829112",
+     "condensedGameFr": "/fr/video/match-condense-lightning-bruins-11-04-2026-6392936337112",
+     "gameCenterLink": "/gamecenter/tbl-vs-bos/2026/04/11/2025021261"
+    },
+    {
+     "id": 2025021262,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "UBS Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T17:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-04:00",
+     "venueTimezone": "America/New_York",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 281,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "TVAS",
+       "sequenceNumber": 120
+      },
+      {
+       "id": 294,
+       "market": "A",
+       "countryCode": "CA",
+       "network": "TSN5",
+       "sequenceNumber": 135
+      },
+      {
+       "id": 409,
+       "market": "H",
+       "countryCode": "US",
+       "network": "MSGSN",
+       "sequenceNumber": 411
+      }
+     ],
+     "awayTeam": {
+      "id": 9,
+      "commonName": {
+       "default": "Senators",
+       "fr": "Sénateurs"
+      },
+      "placeName": {
+       "default": "Ottawa"
+      },
+      "placeNameWithPreposition": {
+       "default": "Ottawa",
+       "fr": "d'Ottawa"
+      },
+      "abbrev": "OTT",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/OTT_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/OTT_dark.svg",
+      "awaySplitSquad": false,
+      "score": 3
+     },
+     "homeTeam": {
+      "id": 2,
+      "commonName": {
+       "default": "Islanders"
+      },
+      "placeName": {
+       "default": "New York"
+      },
+      "placeNameWithPreposition": {
+       "default": "New York",
+       "fr": "de New York"
+      },
+      "abbrev": "NYI",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/NYI_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/NYI_dark.svg",
+      "homeSplitSquad": false,
+      "score": 0
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8476999,
+      "firstInitial": {
+       "default": "L."
+      },
+      "lastName": {
+       "default": "Ullmark"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8482092,
+      "firstInitial": {
+       "default": "R."
+      },
+      "lastName": {
+       "default": "Greig"
+      }
+     },
+     "threeMinRecap": "/video/ott-at-nyi-recap-6392937650112",
+     "threeMinRecapFr": "/fr/video/ott-vs-nyi-11-04-2026-resume-6392936686112",
+     "condensedGame": "/video/ott-at-nyi-condensed-game-6392937267112",
+     "condensedGameFr": "/fr/video/match-condense-senators-islanders-11-04-2026-6392936974112",
+     "gameCenterLink": "/gamecenter/ott-vs-nyi/2026/04/11/2025021262"
+    },
+    {
+     "id": 2025021263,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "PPG Paints Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T19:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-04:00",
+     "venueTimezone": "US/Eastern",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 384,
+       "market": "N",
+       "countryCode": "US",
+       "network": "ABC",
+       "sequenceNumber": 1
+      },
+      {
+       "id": 281,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "TVAS",
+       "sequenceNumber": 120
+      }
+     ],
+     "awayTeam": {
+      "id": 15,
+      "commonName": {
+       "default": "Capitals"
+      },
+      "placeName": {
+       "default": "Washington"
+      },
+      "placeNameWithPreposition": {
+       "default": "Washington",
+       "fr": "de Washington"
+      },
+      "abbrev": "WSH",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/WSH_secondary_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/WSH_secondary_dark.svg",
+      "awaySplitSquad": false,
+      "score": 6
+     },
+     "homeTeam": {
+      "id": 5,
+      "commonName": {
+       "default": "Penguins"
+      },
+      "placeName": {
+       "default": "Pittsburgh"
+      },
+      "placeNameWithPreposition": {
+       "default": "Pittsburgh",
+       "fr": "de Pittsburgh"
+      },
+      "abbrev": "PIT",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/PIT_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/PIT_dark.svg",
+      "homeSplitSquad": false,
+      "score": 3
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8480313,
+      "firstInitial": {
+       "default": "L."
+      },
+      "lastName": {
+       "default": "Thompson"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8484186,
+      "firstInitial": {
+       "default": "R."
+      },
+      "lastName": {
+       "default": "Leonard"
+      }
+     },
+     "threeMinRecap": "/video/wsh-at-pit-recap-6392942430112",
+     "threeMinRecapFr": "/fr/video/wsh-vs-pit-11-04-2026-resume-6392943885112",
+     "condensedGame": "/video/wsh-at-pit-condensed-game-6392943005112",
+     "condensedGameFr": "/fr/video/match-condense-capitals-penguins-11-04-2026-6392942342112",
+     "gameCenterLink": "/gamecenter/wsh-vs-pit/2026/04/11/2025021263"
+    },
+    {
+     "id": 2025021264,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Crypto.com Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T20:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-07:00",
+     "venueTimezone": "America/Los_Angeles",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 289,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SNW",
+       "sequenceNumber": 34
+      },
+      {
+       "id": 577,
+       "market": "H",
+       "countryCode": "US",
+       "network": "FDSNSC",
+       "sequenceNumber": 209
+      },
+      {
+       "id": 22,
+       "market": "H",
+       "countryCode": "US",
+       "network": "KCAL",
+       "sequenceNumber": 655
+      }
+     ],
+     "awayTeam": {
+      "id": 22,
+      "commonName": {
+       "default": "Oilers"
+      },
+      "placeName": {
+       "default": "Edmonton"
+      },
+      "placeNameWithPreposition": {
+       "default": "Edmonton",
+       "fr": "d'Edmonton"
+      },
+      "abbrev": "EDM",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/EDM_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/EDM_dark.svg",
+      "awaySplitSquad": false,
+      "score": 0
+     },
+     "homeTeam": {
+      "id": 26,
+      "commonName": {
+       "default": "Kings"
+      },
+      "placeName": {
+       "default": "Los Angeles"
+      },
+      "placeNameWithPreposition": {
+       "default": "Los Angeles",
+       "fr": "de Los Angeles"
+      },
+      "abbrev": "LAK",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/LAK_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/LAK_dark.svg",
+      "homeSplitSquad": false,
+      "score": 1
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8476341,
+      "firstInitial": {
+       "default": "A."
+      },
+      "lastName": {
+       "default": "Forsberg"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8478550,
+      "firstInitial": {
+       "default": "A."
+      },
+      "lastName": {
+       "default": "Panarin"
+      }
+     },
+     "threeMinRecap": "/video/edm-at-lak-recap-6392945807112",
+     "threeMinRecapFr": "/fr/video/edm-vs-lak-11-04-2026-resume-6392944745112",
+     "condensedGame": "/video/edm-at-lak-condensed-game-6392943659112",
+     "condensedGameFr": "/fr/video/match-condense-oilers-kings-11-04-2026-6392945035112",
+     "gameCenterLink": "/gamecenter/edm-vs-lak/2026/04/11/2025021264"
+    },
+    {
+     "id": 2025021265,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Little Caesars Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T21:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-04:00",
+     "venueTimezone": "America/Detroit",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 562,
+       "market": "H",
+       "countryCode": "US",
+       "network": "FDSNDET",
+       "sequenceNumber": 282
+      },
+      {
+       "id": 409,
+       "market": "A",
+       "countryCode": "US",
+       "network": "MSGSN",
+       "sequenceNumber": 411
+      }
+     ],
+     "awayTeam": {
+      "id": 1,
+      "commonName": {
+       "default": "Devils"
+      },
+      "placeName": {
+       "default": "New Jersey"
+      },
+      "placeNameWithPreposition": {
+       "default": "New Jersey",
+       "fr": "du New Jersey"
+      },
+      "abbrev": "NJD",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/NJD_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/NJD_dark.svg",
+      "awaySplitSquad": false,
+      "score": 5
+     },
+     "homeTeam": {
+      "id": 17,
+      "commonName": {
+       "default": "Red Wings"
+      },
+      "placeName": {
+       "default": "Detroit"
+      },
+      "placeNameWithPreposition": {
+       "default": "Detroit",
+       "fr": "de Detroit"
+      },
+      "abbrev": "DET",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/DET_light.svg?season=20252026",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/DET_dark.svg?season=20252026",
+      "homeSplitSquad": false,
+      "score": 3
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8474596,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Allen"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8479407,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Bratt"
+      }
+     },
+     "threeMinRecap": "/video/njd-at-det-recap-6392948844112",
+     "threeMinRecapFr": "/fr/video/njd-vs-det-11-04-2026-resume-6392947098112",
+     "condensedGame": "/video/njd-at-det-condensed-game-6392949043112",
+     "condensedGameFr": "/fr/video/match-condense-devils-red-wings-11-04-2026-6392947984112",
+     "gameCenterLink": "/gamecenter/njd-vs-det/2026/04/11/2025021265"
+    },
+    {
+     "id": 2025021266,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "United Center"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T21:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-05:00",
+     "venueTimezone": "America/Chicago",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 566,
+       "market": "A",
+       "countryCode": "US",
+       "network": "FDSNMW",
+       "sequenceNumber": 201
+      },
+      {
+       "id": 551,
+       "market": "H",
+       "countryCode": "US",
+       "network": "CHSN",
+       "sequenceNumber": 254
+      }
+     ],
+     "awayTeam": {
+      "id": 19,
+      "commonName": {
+       "default": "Blues"
+      },
+      "placeName": {
+       "default": "St. Louis"
+      },
+      "placeNameWithPreposition": {
+       "default": "St. Louis",
+       "fr": "de St. Louis"
+      },
+      "abbrev": "STL",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/STL_light.svg?season=20252026",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/STL_dark.svg?season=20252026",
+      "awaySplitSquad": false,
+      "score": 5
+     },
+     "homeTeam": {
+      "id": 16,
+      "commonName": {
+       "default": "Blackhawks"
+      },
+      "placeName": {
+       "default": "Chicago"
+      },
+      "placeNameWithPreposition": {
+       "default": "Chicago",
+       "fr": "de Chicago"
+      },
+      "abbrev": "CHI",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/CHI_light.svg?season=20252026",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/CHI_dark.svg?season=20252026",
+      "homeSplitSquad": false,
+      "score": 3
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8480981,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Hofer"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8475764,
+      "firstInitial": {
+       "default": "C."
+      },
+      "lastName": {
+       "default": "Fowler"
+      }
+     },
+     "threeMinRecap": "/video/stl-at-chi-recap-6392946600112",
+     "threeMinRecapFr": "/fr/video/stl-vs-chi-11-04-2026-resume-6392948636112",
+     "condensedGame": "/video/stl-at-chi-condensed-game-6392947390112",
+     "condensedGameFr": "/fr/video/match-condense-blues-blackhawks-11-04-2026-6392947379112",
+     "gameCenterLink": "/gamecenter/stl-vs-chi/2026/04/11/2025021266"
+    },
+    {
+     "id": 2025021267,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Bridgestone Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T21:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-05:00",
+     "venueTimezone": "US/Central",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 561,
+       "market": "H",
+       "countryCode": "US",
+       "network": "FDSNSO",
+       "sequenceNumber": 202
+      },
+      {
+       "id": 567,
+       "market": "A",
+       "countryCode": "US",
+       "network": "FDSNNO",
+       "sequenceNumber": 284
+      },
+      {
+       "id": 570,
+       "market": "A",
+       "countryCode": "US",
+       "network": "FDSNWIX",
+       "sequenceNumber": 420
+      },
+      {
+       "id": 25,
+       "market": "A",
+       "countryCode": "US",
+       "network": "KSTC",
+       "sequenceNumber": 618
+      }
+     ],
+     "awayTeam": {
+      "id": 30,
+      "commonName": {
+       "default": "Wild"
+      },
+      "placeName": {
+       "default": "Minnesota"
+      },
+      "placeNameWithPreposition": {
+       "default": "Minnesota",
+       "fr": "du Minnesota"
+      },
+      "abbrev": "MIN",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/MIN_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/MIN_dark.svg",
+      "awaySplitSquad": false,
+      "score": 1
+     },
+     "homeTeam": {
+      "id": 18,
+      "commonName": {
+       "default": "Predators"
+      },
+      "placeName": {
+       "default": "Nashville"
+      },
+      "placeNameWithPreposition": {
+       "default": "Nashville",
+       "fr": "de Nashville"
+      },
+      "abbrev": "NSH",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/NSH_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/NSH_dark.svg",
+      "homeSplitSquad": false,
+      "score": 2
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8481020,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Annunen"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8484241,
+      "firstInitial": {
+       "default": "M."
+      },
+      "lastName": {
+       "default": "Wood"
+      }
+     },
+     "threeMinRecap": "/video/min-at-nsh-recap-6392947892112",
+     "threeMinRecapFr": "/fr/video/min-vs-nsh-11-04-2026-resume-6392949031112",
+     "condensedGame": "/video/min-at-nsh-condensed-game-6392948648112",
+     "condensedGameFr": "/fr/video/match-condense-wild-predators-11-04-2026-6392949227112",
+     "gameCenterLink": "/gamecenter/min-vs-nsh/2026/04/11/2025021267"
+    },
+    {
+     "id": 2025021268,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "American Airlines Center"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T21:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-05:00",
+     "venueTimezone": "US/Central",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 553,
+       "market": "H",
+       "countryCode": "US",
+       "network": "Victory+",
+       "sequenceNumber": 382
+      },
+      {
+       "id": 27,
+       "market": "A",
+       "countryCode": "US",
+       "network": "MSG",
+       "sequenceNumber": 417
+      }
+     ],
+     "awayTeam": {
+      "id": 3,
+      "commonName": {
+       "default": "Rangers"
+      },
+      "placeName": {
+       "default": "New York"
+      },
+      "placeNameWithPreposition": {
+       "default": "New York",
+       "fr": "de New York"
+      },
+      "abbrev": "NYR",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/NYR_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/NYR_dark.svg",
+      "awaySplitSquad": false,
+      "score": 0
+     },
+     "homeTeam": {
+      "id": 25,
+      "commonName": {
+       "default": "Stars"
+      },
+      "placeName": {
+       "default": "Dallas"
+      },
+      "placeNameWithPreposition": {
+       "default": "Dallas",
+       "fr": "de Dallas"
+      },
+      "abbrev": "DAL",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/DAL_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/DAL_dark.svg",
+      "homeSplitSquad": false,
+      "score": 2
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8479979,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Oettinger"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8480027,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Robertson"
+      }
+     },
+     "threeMinRecap": "/video/nyr-at-dal-recap-6392949129112",
+     "threeMinRecapFr": "/fr/video/nyr-vs-dal-11-04-2026-resume-6392947479112",
+     "condensedGame": "/video/nyr-at-dal-condensed-game-6392947903112",
+     "condensedGameFr": "/fr/video/match-condense-rangers-stars-11-04-2026-6392947789112",
+     "gameCenterLink": "/gamecenter/nyr-vs-dal/2026/04/11/2025021268"
+    },
+    {
+     "id": 2025021269,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Delta Center"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T21:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-06:00",
+     "venueTimezone": "America/Denver",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 561,
+       "market": "A",
+       "countryCode": "US",
+       "network": "FDSNSO",
+       "sequenceNumber": 202
+      },
+      {
+       "id": 558,
+       "market": "H",
+       "countryCode": "US",
+       "network": "Utah16",
+       "sequenceNumber": 381
+      }
+     ],
+     "awayTeam": {
+      "id": 12,
+      "commonName": {
+       "default": "Hurricanes"
+      },
+      "placeName": {
+       "default": "Carolina",
+       "fr": "Caroline"
+      },
+      "placeNameWithPreposition": {
+       "default": "Carolina",
+       "fr": "de la Caroline"
+      },
+      "abbrev": "CAR",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/CAR_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/CAR_dark.svg",
+      "awaySplitSquad": false,
+      "score": 4
+     },
+     "homeTeam": {
+      "id": 68,
+      "commonName": {
+       "default": "Mammoth"
+      },
+      "placeName": {
+       "default": "Utah"
+      },
+      "placeNameWithPreposition": {
+       "default": "Utah",
+       "fr": "de l'Utah"
+      },
+      "abbrev": "UTA",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/UTA_light.svg?season=20252026",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/UTA_dark.svg?season=20252026",
+      "homeSplitSquad": false,
+      "score": 1
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8475883,
+      "firstInitial": {
+       "default": "F."
+      },
+      "lastName": {
+       "default": "Andersen"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8473533,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Staal"
+      }
+     },
+     "threeMinRecap": "/video/car-at-uta-recap-6392947205112",
+     "threeMinRecapFr": "/fr/video/car-vs-uta-11-04-2026-resume-6392949746112",
+     "condensedGame": "/video/car-at-uta-condensed-game-6392948955112",
+     "condensedGameFr": "/fr/video/match-condense-hurricanes-mammoth-11-04-2026-6392949537112",
+     "gameCenterLink": "/gamecenter/car-vs-uta/2026/04/11/2025021269"
+    },
+    {
+     "id": 2025021270,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Scotiabank Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T23:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-04:00",
+     "venueTimezone": "America/Toronto",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 282,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SN",
+       "sequenceNumber": 21
+      },
+      {
+       "id": 4,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "CBC",
+       "sequenceNumber": 101
+      },
+      {
+       "id": 521,
+       "market": "A",
+       "countryCode": "US",
+       "network": "SCRIPPS",
+       "sequenceNumber": 657
+      }
+     ],
+     "awayTeam": {
+      "id": 13,
+      "commonName": {
+       "default": "Panthers"
+      },
+      "placeName": {
+       "default": "Florida",
+       "fr": "Floride"
+      },
+      "placeNameWithPreposition": {
+       "default": "Florida",
+       "fr": "de la Floride"
+      },
+      "abbrev": "FLA",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/FLA_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/FLA_dark.svg",
+      "awaySplitSquad": false,
+      "score": 6
+     },
+     "homeTeam": {
+      "id": 10,
+      "commonName": {
+       "default": "Maple Leafs"
+      },
+      "placeName": {
+       "default": "Toronto"
+      },
+      "placeNameWithPreposition": {
+       "default": "Toronto",
+       "fr": "de Toronto"
+      },
+      "abbrev": "TOR",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/TOR_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/TOR_dark.svg",
+      "homeSplitSquad": false,
+      "score": 2
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8480193,
+      "firstInitial": {
+       "default": "D."
+      },
+      "lastName": {
+       "default": "Tarasov"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8477931,
+      "firstInitial": {
+       "default": "T."
+      },
+      "lastName": {
+       "default": "Nosek"
+      }
+     },
+     "threeMinRecap": "/video/fla-at-tor-recap-6392953222112",
+     "threeMinRecapFr": "/fr/video/fla-vs-tor-11-04-2026-resume-6392951941112",
+     "condensedGame": "/video/fla-at-tor-condensed-game-6392953424112",
+     "condensedGameFr": "/fr/video/match-condense-panthers-maple-leafs-11-04-2026-6392954380112",
+     "gameCenterLink": "/gamecenter/fla-vs-tor/2026/04/11/2025021270"
+    },
+    {
+     "id": 2025021271,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Centre Bell"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T23:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-04:00",
+     "venueTimezone": "America/Montreal",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 287,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SNE",
+       "sequenceNumber": 30
+      },
+      {
+       "id": 281,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "TVAS",
+       "sequenceNumber": 120
+      },
+      {
+       "id": 286,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "CITY",
+       "sequenceNumber": 137
+      },
+      {
+       "id": 565,
+       "market": "A",
+       "countryCode": "US",
+       "network": "FDSNOH",
+       "sequenceNumber": 286
+      }
+     ],
+     "awayTeam": {
+      "id": 29,
+      "commonName": {
+       "default": "Blue Jackets"
+      },
+      "placeName": {
+       "default": "Columbus"
+      },
+      "placeNameWithPreposition": {
+       "default": "Columbus",
+       "fr": "de Columbus"
+      },
+      "abbrev": "CBJ",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/CBJ_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/CBJ_dark.svg",
+      "awaySplitSquad": false,
+      "score": 5
+     },
+     "homeTeam": {
+      "id": 8,
+      "commonName": {
+       "default": "Canadiens"
+      },
+      "placeName": {
+       "default": "Montréal"
+      },
+      "placeNameWithPreposition": {
+       "default": "Montréal",
+       "fr": "de Montréal"
+      },
+      "abbrev": "MTL",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/MTL_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/MTL_dark.svg",
+      "homeSplitSquad": false,
+      "score": 2
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8482982,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Greaves"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8480893,
+      "firstInitial": {
+       "default": "K."
+      },
+      "lastName": {
+       "default": "Marchenko",
+       "cs": "Marčenko",
+       "fi": "Martshenko",
+       "sk": "Marčenko"
+      }
+     },
+     "threeMinRecap": "/video/cbj-at-mtl-recap-6392953317112",
+     "threeMinRecapFr": "/fr/video/cbj-vs-mtl-11-04-2026-resume-6392953415112",
+     "condensedGame": "/video/cbj-at-mtl-condensed-game-6392954384112",
+     "condensedGameFr": "/fr/video/match-condense-blue-jackets-canadiens-11-04-2026-6392953417112",
+     "gameCenterLink": "/gamecenter/cbj-vs-mtl/2026/04/11/2025021271"
+    },
+    {
+     "id": 2025021272,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Canada Life Centre"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T23:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-05:00",
+     "venueTimezone": "America/Winnipeg",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 284,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SN1",
+       "sequenceNumber": 113
+      },
+      {
+       "id": 322,
+       "market": "A",
+       "countryCode": "US",
+       "network": "NBCSP",
+       "sequenceNumber": 389
+      }
+     ],
+     "awayTeam": {
+      "id": 4,
+      "commonName": {
+       "default": "Flyers"
+      },
+      "placeName": {
+       "default": "Philadelphia",
+       "fr": "Philadelphie"
+      },
+      "placeNameWithPreposition": {
+       "default": "Philadelphia",
+       "fr": "de Philadelphie"
+      },
+      "abbrev": "PHI",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/PHI_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/PHI_dark.svg",
+      "awaySplitSquad": false,
+      "score": 7
+     },
+     "homeTeam": {
+      "id": 52,
+      "commonName": {
+       "default": "Jets"
+      },
+      "placeName": {
+       "default": "Winnipeg"
+      },
+      "placeNameWithPreposition": {
+       "default": "Winnipeg",
+       "fr": "de Winnipeg"
+      },
+      "abbrev": "WPG",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/WPG_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/WPG_dark.svg",
+      "homeSplitSquad": false,
+      "score": 1
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8478435,
+      "firstInitial": {
+       "default": "D."
+      },
+      "lastName": {
+       "default": "Vladar",
+       "cs": "Vladař",
+       "sk": "Vladař"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8484387,
+      "firstInitial": {
+       "default": "M."
+      },
+      "lastName": {
+       "default": "Michkov",
+       "cs": "Mičkov",
+       "fi": "Mitshkov",
+       "sk": "Mičkov"
+      }
+     },
+     "threeMinRecap": "/video/phi-at-wpg-recap-6392951933112",
+     "threeMinRecapFr": "/fr/video/phi-vs-wpg-11-04-2026-resume-6392952531112",
+     "condensedGame": "/video/phi-at-wpg-condensed-game-6392952919112",
+     "condensedGameFr": "/fr/video/match-condense-flyers-jets-11-04-2026-6392953407112",
+     "gameCenterLink": "/gamecenter/phi-vs-wpg/2026/04/11/2025021272"
+    },
+    {
+     "id": 2025021273,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Climate Pledge Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-11T23:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-07:00",
+     "venueTimezone": "US/Pacific",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 289,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SNW",
+       "sequenceNumber": 34
+      },
+      {
+       "id": 554,
+       "market": "H",
+       "countryCode": "US",
+       "network": "KHN/Prime",
+       "sequenceNumber": 348
+      },
+      {
+       "id": 552,
+       "market": "H",
+       "countryCode": "US",
+       "network": "KING 5",
+       "sequenceNumber": 349
+      },
+      {
+       "id": 388,
+       "market": "H",
+       "countryCode": "US",
+       "network": "KONG",
+       "sequenceNumber": 654
+      }
+     ],
+     "awayTeam": {
+      "id": 20,
+      "commonName": {
+       "default": "Flames"
+      },
+      "placeName": {
+       "default": "Calgary"
+      },
+      "placeNameWithPreposition": {
+       "default": "Calgary",
+       "fr": "de Calgary"
+      },
+      "abbrev": "CGY",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/CGY_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/CGY_dark.svg",
+      "awaySplitSquad": false,
+      "score": 1
+     },
+     "homeTeam": {
+      "id": 55,
+      "commonName": {
+       "default": "Kraken"
+      },
+      "placeName": {
+       "default": "Seattle"
+      },
+      "placeNameWithPreposition": {
+       "default": "Seattle",
+       "fr": "de Seattle"
+      },
+      "abbrev": "SEA",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/SEA_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/SEA_dark.svg",
+      "homeSplitSquad": false,
+      "score": 4
+     },
+     "periodDescriptor": {
+      "number": 3,
+      "periodType": "REG",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "REG"
+     },
+     "winningGoalie": {
+      "playerId": 8483668,
+      "firstInitial": {
+       "default": "N."
+      },
+      "lastName": {
+       "default": "Kokko"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8476905,
+      "firstInitial": {
+       "default": "C."
+      },
+      "lastName": {
+       "default": "Stephenson"
+      }
+     },
+     "threeMinRecap": "/video/cgy-at-sea-recap-6392953017112",
+     "threeMinRecapFr": "/fr/video/cgy-vs-sea-11-04-2026-resume-6392952240112",
+     "condensedGame": "/video/cgy-at-sea-condensed-game-6392951837112",
+     "condensedGameFr": "/fr/video/match-condense-flames-kraken-11-04-2026-6392951835112",
+     "gameCenterLink": "/gamecenter/cgy-vs-sea/2026/04/11/2025021273"
+    },
+    {
+     "id": 2025021274,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "Ball Arena"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-12T00:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-06:00",
+     "venueTimezone": "America/Denver",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 384,
+       "market": "N",
+       "countryCode": "US",
+       "network": "ABC",
+       "sequenceNumber": 1
+      }
+     ],
+     "awayTeam": {
+      "id": 54,
+      "commonName": {
+       "default": "Golden Knights"
+      },
+      "placeName": {
+       "default": "Vegas"
+      },
+      "placeNameWithPreposition": {
+       "default": "Vegas",
+       "fr": "de Vegas"
+      },
+      "abbrev": "VGK",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/VGK_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/VGK_dark.svg",
+      "awaySplitSquad": false,
+      "score": 3
+     },
+     "homeTeam": {
+      "id": 21,
+      "commonName": {
+       "default": "Avalanche"
+      },
+      "placeName": {
+       "default": "Colorado"
+      },
+      "placeNameWithPreposition": {
+       "default": "Colorado",
+       "fr": "du Colorado"
+      },
+      "abbrev": "COL",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/COL_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/COL_dark.svg",
+      "homeSplitSquad": false,
+      "score": 2
+     },
+     "periodDescriptor": {
+      "number": 4,
+      "periodType": "OT",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "OT"
+     },
+     "winningGoalie": {
+      "playerId": 8479394,
+      "firstInitial": {
+       "default": "C."
+      },
+      "lastName": {
+       "default": "Hart"
+      }
+     },
+     "winningGoalScorer": {
+      "playerId": 8478403,
+      "firstInitial": {
+       "default": "J."
+      },
+      "lastName": {
+       "default": "Eichel"
+      }
+     },
+     "threeMinRecap": "/video/vgk-at-col-recap-6392956812112",
+     "threeMinRecapFr": "/fr/video/vgk-vs-col-11-04-2026-resume-6392954156112",
+     "condensedGame": "/video/vgk-at-col-condensed-game-6392956613112",
+     "condensedGameFr": "/fr/video/match-condense-golden-knights-avalanche-11-04-2026-6392954845112",
+     "gameCenterLink": "/gamecenter/vgk-vs-col/2026/04/11/2025021274"
+    },
+    {
+     "id": 2025021275,
+     "season": 20252026,
+     "gameType": 2,
+     "venue": {
+      "default": "SAP Center at San Jose",
+      "es": "SAP Center en San Jose",
+      "fr": "SAP Center de San Jose"
+     },
+     "neutralSite": false,
+     "startTimeUTC": "2026-04-12T02:00:00Z",
+     "easternUTCOffset": "-04:00",
+     "venueUTCOffset": "-07:00",
+     "venueTimezone": "US/Pacific",
+     "gameState": "OFF",
+     "gameScheduleState": "OK",
+     "tvBroadcasts": [
+      {
+       "id": 4,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "CBC",
+       "sequenceNumber": 101
+      },
+      {
+       "id": 282,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "SN",
+       "sequenceNumber": 107
+      },
+      {
+       "id": 286,
+       "market": "N",
+       "countryCode": "CA",
+       "network": "CITY",
+       "sequenceNumber": 137
+      },
+      {
+       "id": 314,
+       "market": "H",
+       "countryCode": "US",
+       "network": "NBCSCA",
+       "sequenceNumber": 393
+      }
+     ],
+     "awayTeam": {
+      "id": 23,
+      "commonName": {
+       "default": "Canucks"
+      },
+      "placeName": {
+       "default": "Vancouver"
+      },
+      "placeNameWithPreposition": {
+       "default": "Vancouver",
+       "fr": "de Vancouver"
+      },
+      "abbrev": "VAN",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/VAN_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/VAN_dark.svg",
+      "awaySplitSquad": false,
+      "score": 4
+     },
+     "homeTeam": {
+      "id": 28,
+      "commonName": {
+       "default": "Sharks"
+      },
+      "placeName": {
+       "default": "San Jose"
+      },
+      "placeNameWithPreposition": {
+       "default": "San Jose",
+       "fr": "de San Jose"
+      },
+      "abbrev": "SJS",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/SJS_light.svg",
+      "darkLogo": "https://assets.nhle.com/logos/nhl/svg/SJS_dark.svg",
+      "homeSplitSquad": false,
+      "score": 3
+     },
+     "periodDescriptor": {
+      "number": 5,
+      "periodType": "SO",
+      "maxRegulationPeriods": 3
+     },
+     "gameOutcome": {
+      "lastPeriodType": "SO"
+     },
+     "winningGoalie": {
+      "playerId": 8480947,
+      "firstInitial": {
+       "default": "K."
+      },
+      "lastName": {
+       "default": "Lankinen"
+      }
+     },
+     "threeMinRecap": "/video/van-at-sjs-recap-6392958003112",
+     "threeMinRecapFr": "/fr/video/van-vs-sjs-11-04-2026-resume-6392957297112",
+     "condensedGame": "/video/van-at-sjs-condensed-game-6392960156112",
+     "condensedGameFr": "/fr/video/match-condense-canucks-sharks-11-04-2026-6392960149112",
+     "gameCenterLink": "/gamecenter/van-vs-sjs/2026/04/11/2025021275"
+    }
+   ]
+  }
+ ],
+ "preSeasonStartDate": "2025-09-20",
+ "regularSeasonStartDate": "2025-10-07",
+ "regularSeasonEndDate": "2026-04-17",
+ "playoffEndDate": "2026-06-15",
+ "numberOfGames": 52
+}

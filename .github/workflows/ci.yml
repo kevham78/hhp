@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    name: Lint, type-check, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+
+  integration:
+    name: Integration tests (Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: hhp_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U test -d hhp_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://test:test@localhost:5432/hhp_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - run: npx prisma generate
+      - run: npm run test:integration
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t hhp-app -f Dockerfile .
+      - run: docker build -t hhp-cron -f Dockerfile.cron .
+      # The app image runs `prisma migrate deploy` at startup — make sure it
+      # actually starts against an empty database (this caught nothing
+      # before, which is how the Prisma 7 crash-loop reached the Synology).
+      - name: App container starts and migrates
+        run: |
+          docker network create ci
+          docker run -d --name db --network ci -e POSTGRES_USER=t -e POSTGRES_PASSWORD=t -e POSTGRES_DB=hhp_test postgres:16-alpine
+          for i in $(seq 1 30); do docker exec db pg_isready -U t -d hhp_test && break; sleep 1; done
+          docker run -d --name app --network ci -p 3000:3000 \
+            -e DATABASE_URL=postgresql://t:t@db:5432/hhp_test \
+            -e AUTH_SECRET=ci-only-secret -e AUTH_TRUST_HOST=true hhp-app
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3000/login && break; sleep 1; done
+          docker logs app
+          curl -sf -o /dev/null http://localhost:3000/login

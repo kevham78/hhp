@@ -102,9 +102,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No active season' }, { status: 404 })
     }
 
-    // Check deadline — can't submit after Friday 2pm
-// In development, always allow submission for testing
-if (!isDraft && isPastDeadline(week) && process.env.NODE_ENV !== 'development') {
+    // Check deadline — no changes at all after Friday 2pm, drafts
+    // included: picks are revealed then, so a "draft" save would let
+    // someone change picks after seeing everyone else's.
+    // In development, always allow submission for testing
+if (isPastDeadline(week) && process.env.NODE_ENV !== 'development') {
   return NextResponse.json(
     { error: 'Picks deadline has passed' },
     { status: 400 }

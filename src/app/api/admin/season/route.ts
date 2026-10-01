@@ -29,6 +29,19 @@ export async function POST(req: Request) {
 
     const { seasonId } = parsed.data
 
+    // Starting resets every player's points and suicide-pool status for
+    // this season — never do that to the season that's already running.
+    const target = await prisma.season.findUnique({ where: { id: seasonId } })
+    if (!target) {
+      return NextResponse.json({ error: 'Season not found' }, { status: 404 })
+    }
+    if (target.isActive) {
+      return NextResponse.json(
+        { error: 'This season is already running. Starting it again would reset all points and suicide pools.' },
+        { status: 400 }
+      )
+    }
+
     // Deactivate all other seasons
     await prisma.season.updateMany({
       where: { isActive: true },

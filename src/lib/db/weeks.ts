@@ -187,7 +187,7 @@ function fridayAtEasternTime(saturday: Date, timeEastern: string): Date {
   return fromZonedTime(`${y}-${m}-${d}T${timeEastern}:00`, EASTERN_TZ)
 }
 
-function getPicksDeadline(saturday: Date, timeEastern: string): Date {
+export function getPicksDeadline(saturday: Date, timeEastern: string): Date {
   return fridayAtEasternTime(saturday, timeEastern)
 }
 

@@ -30,7 +30,7 @@ const DAY_MAP: Record<string, number> = {
   Thursday: 4, Friday: 5, Saturday: 6,
 }
 
-function toCron(day: string, time: string): string {
+export function toCron(day: string, time: string): string {
   const dayNum          = DAY_MAP[day] ?? 5
   const [hours, minutes] = time.split(':').map(Number)
   // node-cron's `timezone` option (set to 'America/Toronto' below)
@@ -49,7 +49,7 @@ function toCron(day: string, time: string): string {
 // there's anything to pick.
 // ─────────────────────────────────────────────
 
-function isWithinJobWindow(week: { saturdayDate: Date }): boolean {
+export function isWithinJobWindow(week: { saturdayDate: Date }): boolean {
   const sevenDaysBefore = new Date(week.saturdayDate)
   sevenDaysBefore.setUTCDate(sevenDaysBefore.getUTCDate() - 7)
   return new Date() >= sevenDaysBefore
