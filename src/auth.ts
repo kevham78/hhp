@@ -54,7 +54,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id                 = user.id
         token.role               = (user as any).role
         token.mustChangePassword = (user as any).mustChangePassword
+        return token
       }
+
+      // Re-check the user on every request instead of trusting the
+      // cookie for its whole 30-day life. If the account was deleted,
+      // deactivated or re-created (new id) since login, end the session
+      // so the player is sent to log in again — otherwise every save
+      // fails with a foreign-key error against the old user id.
+      // (Safe now that proxy.ts runs on the Node runtime, not Edge.)
+      const dbUser = token.id
+        ? await prisma.user.findUnique({
+            where:  { id: token.id as string },
+            select: { isActive: true, role: true, mustChangePassword: true },
+          })
+        : null
+      if (!dbUser || !dbUser.isActive) return null
+
+      token.role               = dbUser.role
+      token.mustChangePassword = dbUser.mustChangePassword
       return token
     },
     async session({ session, token }) {
