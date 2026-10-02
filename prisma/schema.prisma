@@ -120,6 +120,7 @@ model Season {
   seasonStats SeasonStat[]
   suicideStatus SuicideStatus[]
   monthlyResults MonthlyResult[]
+  payments    Payment[]
   pastWinner  PastSeasonWinner?
 
   @@map("seasons")
@@ -341,6 +342,7 @@ model Payment {
   id            String        @id @default(cuid())
   playerId      String
   weekId        String?       // null for monthly payments
+  seasonId      String?       // season the payment belongs to (dues reset each season)
   type          PaymentType
   amount        Float
   description   String
@@ -352,6 +354,7 @@ model Payment {
   recipient     User?         @relation("PlayerWinnings", fields: [recipientId], references: [id])
   player        User          @relation("PlayerPayments", fields: [playerId], references: [id])
   week          Week?         @relation(fields: [weekId], references: [id])
+  season        Season?       @relation(fields: [seasonId], references: [id])
 
   @@map("payments")
 }
@@ -377,7 +380,7 @@ model Settings {
 
   // Email schedule (day + time in EST)
   resultsEmailDay         String   @default("Monday")
-  resultsEmailTime        String   @default("09:00")
+  resultsEmailTime        String   @default("05:00")
   reminderOneDay          String   @default("Thursday")
   reminderOneTime         String   @default("15:00")
   reminderTwoDay          String   @default("Friday")
@@ -385,7 +388,7 @@ model Settings {
   picksRevealDay          String   @default("Friday")
   picksRevealTime         String   @default("14:00")
   autoApproveDay          String   @default("Monday")
-  autoApproveTime         String   @default("11:00")
+  autoApproveTime         String   @default("09:00")
 
   updatedAt               DateTime @updatedAt
   updatedBy               String?

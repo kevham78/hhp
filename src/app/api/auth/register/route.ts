@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db/prisma'
+import { findUserByEmail } from '@/lib/db/users'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
     if (invite.email.toLowerCase() !== email.toLowerCase()) {
       return NextResponse.json({ error: 'Email does not match invite.' }, { status: 400 })
     }
-    const existing = await prisma.user.findUnique({ where: { email } })
+    const existing = await findUserByEmail(email)
     if (existing) return NextResponse.json({ error: 'Email already registered.' }, { status: 400 })
     const hashed = await bcrypt.hash(password, 12)
     const user = await prisma.user.create({

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { findUserByEmail } from '@/lib/db/users'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
@@ -19,18 +20,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Password must be at least 8 characters.' }, { status: 400 })
     }
 
-    const { email, token, newPassword } = parsed.data
+    const { token, newPassword } = parsed.data
+
+    const user = await findUserByEmail(parsed.data.email)
+    if (!user || !user.isActive) {
+      return NextResponse.json({ error: INVALID_MESSAGE }, { status: 400 })
+    }
+    // Reset tokens are stored against the account's own address
+    const email = user.email
 
     const record = await prisma.verificationToken.findUnique({
       where: { identifier_token: { identifier: email, token } },
     })
 
     if (!record || record.expires < new Date()) {
-      return NextResponse.json({ error: INVALID_MESSAGE }, { status: 400 })
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } })
-    if (!user || !user.isActive) {
       return NextResponse.json({ error: INVALID_MESSAGE }, { status: 400 })
     }
 

@@ -72,11 +72,12 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     })
 
-    // Get dues payments (cash paid to commissioner)
+    // Get dues payments (cash paid to commissioner) — this season only,
+    // so balances start fresh when a new season begins
     const duesPayments = await prisma.payment.findMany({
       where: {
         type:    'DUES_PAID',
-        weekId:  null,
+        seasonId: season.id,
         playerId: { in: players.map(p => p.id) },
       },
       orderBy: { createdAt: 'desc' },
@@ -236,9 +237,15 @@ export async function POST(req: Request) {
 
     const { playerId, amount, note } = parsed.data
 
+    const season = await prisma.season.findFirst({ where: { isActive: true } })
+    if (!season) {
+      return NextResponse.json({ error: 'No active season' }, { status: 400 })
+    }
+
     const payment = await prisma.payment.create({
       data: {
         playerId,
+        seasonId:    season.id,
         type:        'DUES_PAID',
         amount,
         description: note || 'Payment to commissioner',

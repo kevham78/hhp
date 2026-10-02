@@ -18,6 +18,8 @@ interface Settings {
   reminderTwoTime:    string
   picksRevealDay:     string
   picksRevealTime:    string
+  resultsEmailDay:    string
+  resultsEmailTime:   string
   autoApproveDay:     string
   autoApproveTime:    string
 }
@@ -329,6 +331,12 @@ const splitMatch     = Math.abs(splitTotal - totalCollected) < 0.01
               dayKey:  'picksRevealDay'  as keyof Settings,
               timeKey: 'picksRevealTime' as keyof Settings,
               hint:    'Auto-pick deadline + reveal all picks',
+            },
+            {
+              label:   'Results Ready (Commissioner)',
+              dayKey:  'resultsEmailDay'  as keyof Settings,
+              timeKey: 'resultsEmailTime' as keyof Settings,
+              hint:    'Emails the commissioner to review and confirm last weekend\'s results',
             },
             {
               label:   'Results Auto-Approve',

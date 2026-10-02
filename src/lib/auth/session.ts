@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/db/prisma'
+import { findUserByEmail } from '@/lib/db/users'
 
 // Login and session logic used by src/auth.ts, kept here (free of
 // NextAuth itself) so it can be tested directly.
@@ -17,7 +18,7 @@ export async function verifyCredentials(credentials: unknown) {
 
   const { email, password } = parsed.data
 
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await findUserByEmail(email)
 
   if (!user || !user.password) return null
   if (!user.isActive) return null

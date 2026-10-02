@@ -72,6 +72,26 @@ async function getActiveWeek() {
 }
 
 // ─────────────────────────────────────────────
+// Oldest past week still waiting for results
+// ─────────────────────────────────────────────
+
+async function getWeekAwaitingResults() {
+  const season = await prisma.season.findFirst({
+    where: { isActive: true },
+  })
+  if (!season) return null
+
+  return prisma.week.findFirst({
+    where: {
+      seasonId:   season.id,
+      status:     { not: 'COMPLETED' },
+      sundayDate: { lt: new Date() },
+    },
+    orderBy: { weekNumber: 'asc' },
+  })
+}
+
+// ─────────────────────────────────────────────
 // Send reminder to players who haven't picked
 // ─────────────────────────────────────────────
 
@@ -169,15 +189,18 @@ async function runDeadlineJob() {
 }
 
 // ─────────────────────────────────────────────
-// Sunday nudge to commissioner
+// Commissioner "results ready to review" email
 // ─────────────────────────────────────────────
 
-async function runCommissionerNudge() {
+export async function runCommissionerNudge() {
   console.log('[Cron] Running commissioner nudge')
 
-  const week = await getActiveWeek()
+  // The week to review is the oldest one whose games are over but whose
+  // results aren't confirmed. By now it was LOCKED at Friday's deadline,
+  // so looking for an OPEN week (as this used to) never found anything.
+  const week = await getWeekAwaitingResults()
   if (!week) {
-    console.log('[Cron] No active week — skipping nudge')
+    console.log('[Cron] No week awaiting results — skipping nudge')
     return
   }
   if (!isWithinJobWindow(week)) {
@@ -219,7 +242,7 @@ async function runCommissionerNudge() {
 // a prior attempt failed (e.g. games not final).
 // ─────────────────────────────────────────────
 
-async function runAutoApprove() {
+export async function runAutoApprove() {
   console.log('[Cron] Running results auto-approve')
 
   const season = await prisma.season.findFirst({
@@ -264,6 +287,7 @@ async function runAutoApprove() {
 // ─────────────────────────────────────────────
 
 let scheduledJobs: ScheduledTask[] = []
+let loadedSettingsAt: number | null = null
 
 export async function startScheduler() {
   console.log('[Cron] Starting scheduler...')
@@ -281,6 +305,7 @@ export async function startScheduler() {
     console.error('[Cron] No settings found — scheduler not started')
     return
   }
+  loadedSettingsAt = settings.updatedAt.getTime()
 
   // Thursday reminder
   const thursdayCron = toCron(settings.reminderOneDay, settings.reminderOneTime)
@@ -316,7 +341,7 @@ export async function startScheduler() {
       timezone: 'America/Toronto',
     })
   )
-  console.log(`[Cron] Sunday nudge scheduled: ${nudgeCron}`)
+  console.log(`[Cron] Results-ready nudge scheduled: ${nudgeCron}`)
 
   // Monday auto-approve
   const autoApproveCron = toCron(settings.autoApproveDay, settings.autoApproveTime)
@@ -328,4 +353,28 @@ export async function startScheduler() {
   console.log(`[Cron] Auto-approve job scheduled: ${autoApproveCron}`)
 
   console.log('[Cron] Scheduler started successfully')
+}
+
+// ─────────────────────────────────────────────
+// Pick up schedule changes made on the admin
+// Settings page. Jobs are scheduled once at
+// startup, so without this a changed time only
+// took effect after the cron container restarted.
+// ─────────────────────────────────────────────
+
+export function watchSettings(intervalMs = 5 * 60_000) {
+  return setInterval(async () => {
+    try {
+      const settings = await prisma.settings.findFirst({
+        where:  { id: 'default' },
+        select: { updatedAt: true },
+      })
+      if (settings && settings.updatedAt.getTime() !== loadedSettingsAt) {
+        console.log('[Cron] Settings changed — rescheduling jobs')
+        await startScheduler()
+      }
+    } catch (err) {
+      console.error('[Cron] Failed to check for settings changes:', err)
+    }
+  }, intervalMs)
 }

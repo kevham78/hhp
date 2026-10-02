@@ -210,6 +210,7 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
     for (const winnerId of winnerIds) {
       await prisma.payment.create({
         data: {
+          seasonId:    season.id,
           playerId:    winnerId,
           weekId,
           type:        'WEEKLY_WINNING',
@@ -339,6 +340,7 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
 
         await prisma.payment.create({
           data: {
+            seasonId:    season.id,
             playerId:    winnerId,
             weekId,
             type:        'SUICIDE_WINNING',
@@ -377,6 +379,7 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
         for (const status of activeStatuses) {
           await prisma.payment.create({
             data: {
+              seasonId:    season.id,
               playerId:    status.userId,
               weekId,
               type:        'SUICIDE_WINNING',

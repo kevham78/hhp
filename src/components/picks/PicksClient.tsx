@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NHLGameFromAPI } from '@/lib/api/nhl'
 import GamePickCard from './GamePickCard'
 import PhaseBanner from './PhaseBanner'
@@ -35,6 +35,17 @@ interface PicksClientProps {
   isOpen:           boolean
   winnerTeamsUsed:  string[]
   loserTeamsUsed:   string[]
+  isSubmitted:      boolean        // all saved picks are submitted (not drafts)
+  submittedAt:      string | null  // when they were last submitted
+}
+
+// Comparable form of a set of picks, so we can tell if anything changed
+function snapshot(s: PicksState): string {
+  return JSON.stringify({
+    picks:       Object.entries(s.picks).sort(),
+    tiebreakers: Object.entries(s.tiebreakers).sort(),
+    suicide:     [s.suicide.winner, s.suicide.loser],
+  })
 }
 
 
@@ -53,12 +64,21 @@ export default function PicksClient({
   isOpen,
   winnerTeamsUsed,
   loserTeamsUsed,
+  isSubmitted,
+  submittedAt,
 }: PicksClientProps) {
 
   const [state, setState] = useState<PicksState>(existingPicks)
   const [saving, setSaving] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
+  // What's saved on the server, to show "locked in" until something changes
+  const [submitted, setSubmitted] = useState(isSubmitted)
+  const [savedSnapshot, setSavedSnapshot] = useState(() => snapshot(existingPicks))
+  const [lastSubmittedAt, setLastSubmittedAt] = useState(submittedAt)
+  const [formattedSubmittedAt, setFormattedSubmittedAt] = useState('')
+  const topRef = useRef<HTMLDivElement>(null)
   const [formattedDeadline, setFormattedDeadline] = useState('')
   const [formattedSatDate, setFormattedSatDate] = useState('')
   const [formattedSunDate, setFormattedSunDate] = useState('')
@@ -131,6 +151,32 @@ const hasSuicideLoser  = !!state.suicide.loser
 const allSuicide       = hasSuicideWinner && hasSuicideLoser
 
   const canSubmit = allPicked && allTiebreakers && allSuicide
+
+  const hasChanges = snapshot(state) !== savedSnapshot
+  const lockedIn   = submitted && !hasChanges
+
+  // Formatted in the browser (not on the server) to avoid a hydration mismatch
+  useEffect(() => {
+    setFormattedSubmittedAt(lastSubmittedAt
+      ? new Date(lastSubmittedAt).toLocaleString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York', timeZoneName: 'short',
+        })
+      : '')
+  }, [lastSubmittedAt])
+
+  // Scroll up to the status message and pop a confirmation bubble
+  function announce(text: string, type: 'success' | 'error') {
+    setMessage({ text, type })
+    if (type === 'success') setToast(text)
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 4000)
+    return () => clearTimeout(t)
+  }, [toast])
 
   // ── Pick a team ────────────────────────────
 function handlePick(gameId: string, teamCode: string) {
@@ -213,9 +259,10 @@ function handleRandomPicks() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      setMessage({ text: 'Draft saved!', type: 'success' })
+      setSavedSnapshot(snapshot(state))
+      announce('Draft saved!', 'success')
     } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to save draft.', type: 'error' })
+      announce(err.message || 'Failed to save draft.', 'error')
     } finally {
       setSaving(false)
     }
@@ -234,16 +281,19 @@ function handleRandomPicks() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      setMessage({ text: '✅ Picks submitted successfully!', type: 'success' })
+      setSubmitted(true)
+      setSavedSnapshot(snapshot(state))
+      setLastSubmittedAt(new Date().toISOString())
+      announce('✅ Picks submitted successfully!', 'success')
     } catch (err: any) {
-      setMessage({ text: err.message || 'Failed to submit picks.', type: 'error' })
+      announce(err.message || 'Failed to submit picks.', 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    <div ref={topRef} className="space-y-6 pb-12 scroll-mt-20">
 
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -279,6 +329,26 @@ function handleRandomPicks() {
         }`}>
           {message.text}
         </div>
+      )}
+
+      {/* Submission status */}
+      {isOpen && submitted && (
+        lockedIn ? (
+          <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+            <p className="text-green-400 font-bold">🔒 Your picks are locked in</p>
+            <p className="text-white/50 text-sm mt-0.5">
+              {formattedSubmittedAt ? `Submitted ${formattedSubmittedAt}. ` : ''}
+              You can still change them until the deadline.
+            </p>
+          </div>
+        ) : (
+          <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+            <p className="text-yellow-400 font-bold">You've made changes</p>
+            <p className="text-white/50 text-sm mt-0.5">
+              Submit again to update your picks — until then, your earlier submission stands.
+            </p>
+          </div>
+        )
       )}
 
       {/* ── PHASE 1: PICKS ─────────────────── */}
@@ -377,22 +447,38 @@ function handleRandomPicks() {
       {/* ── ACTION BUTTONS ────────────────── */}
       {isOpen && (
         <div className="flex gap-3 pt-4 border-t border-hhp-navy-light sticky bottom-0 bg-hhp-navy py-4">
+          {/* Saving a draft after submitting would un-submit the picks */}
+          {!submitted && (
           <button
             onClick={handleSaveDraft}
-            disabled={saving || pickedCount === 0}
+            disabled={saving || pickedCount === 0 || !hasChanges}
             className="flex-1 py-3 rounded-lg border border-hhp-gold/30 text-hhp-gold font-bold
                        hover:bg-hhp-gold/10 disabled:opacity-40 transition-colors"
           >
             {saving ? 'Saving...' : 'Save Draft'}
           </button>
+          )}
           <button
             onClick={handleSubmit}
-            disabled={!canSubmit || submitting}
-            className="flex-1 py-3 rounded-lg bg-hhp-red hover:bg-hhp-red-dark
-                       text-white font-bold disabled:opacity-40 transition-colors"
+            disabled={!canSubmit || submitting || lockedIn}
+            className={`flex-1 py-3 rounded-lg font-bold transition-colors ${
+              lockedIn
+                ? 'bg-green-600/20 border border-green-500/40 text-green-400 cursor-default'
+                : 'bg-hhp-red hover:bg-hhp-red-dark text-white disabled:opacity-40'
+            }`}
           >
-            {submitting ? 'Submitting...' : 'Submit Picks'}
+            {submitting ? 'Submitting...'
+              : lockedIn  ? '✓ Picks Locked In'
+              : submitted ? 'Submit Changes'
+              : 'Submit Picks'}
           </button>
+        </div>
+      )}
+      {/* Confirmation bubble */}
+      {toast && (
+        <div role="status" className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full
+                        bg-green-600 text-white font-bold shadow-lg animate-fade-in">
+          {toast}
         </div>
       )}
       {statsGame && (

@@ -83,7 +83,7 @@ async function main() {
       suicideWinnerPrize: 5.00,
       suicideLoserPrize:  5.00,
       resultsEmailDay:    'Monday',
-      resultsEmailTime:   '09:00',
+      resultsEmailTime:   '05:00',
       reminderOneDay:     'Thursday',
       reminderOneTime:    '15:00',
       reminderTwoDay:     'Friday',

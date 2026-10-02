@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { findUserByEmail } from '@/lib/db/users'
 import { z } from 'zod'
 import crypto from 'crypto'
 
@@ -17,14 +18,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
-    const { email } = parsed.data
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await findUserByEmail(parsed.data.email)
 
     // Always respond the same way whether or not the account exists,
     // so this endpoint can't be used to discover who's registered.
     if (!user || !user.isActive) {
       return NextResponse.json({ success: true, message: GENERIC_MESSAGE })
     }
+
+    // Tokens and the reset link use the address as stored on the account
+    const email = user.email
 
     // Clear any previous unused reset tokens for this email
     await prisma.verificationToken.deleteMany({ where: { identifier: email } })

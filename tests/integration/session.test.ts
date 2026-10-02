@@ -9,6 +9,12 @@ describe('verifyCredentials (login)', () => {
       .toMatchObject({ id: u.id, role: 'ADMIN', mustChangePassword: false })
   })
 
+  it('ignores the case of the email address', async () => {
+    const u = await createUser({ email: 'Wayne.Hicks@Test.invalid' })
+    expect(await verifyCredentials({ email: 'wayne.hicks@test.invalid', password: PASSWORD })).toMatchObject({ id: u.id })
+    expect(await verifyCredentials({ email: 'WAYNE.HICKS@TEST.INVALID', password: PASSWORD })).toMatchObject({ id: u.id })
+  })
+
   it('rejects a wrong password, unknown email, inactive player or junk input', async () => {
     await createUser({ email: 'a@test.invalid' })
     await createUser({ email: 'gone@test.invalid', isActive: false })

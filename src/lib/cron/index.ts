@@ -1,11 +1,13 @@
-import { startScheduler } from './scheduler'
+import { startScheduler, watchSettings } from './scheduler'
 
 console.log('[Cron] HHP Cron Service starting...')
 
-startScheduler().catch(err => {
-  console.error('[Cron] Failed to start scheduler:', err)
-  process.exit(1)
-})
+startScheduler()
+  .then(() => watchSettings())
+  .catch(err => {
+    console.error('[Cron] Failed to start scheduler:', err)
+    process.exit(1)
+  })
 
 // Keep the process alive
 process.on('SIGTERM', () => {

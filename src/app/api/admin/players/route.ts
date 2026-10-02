@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db/prisma'
+import { findUserByEmail } from '@/lib/db/users'
 import { z } from 'zod'
 
 const inviteSchema = z.object({
@@ -136,7 +137,7 @@ async function handleInvite(body: any, adminId: string) {
   const { email, name } = parsed.data
 
   // Check if user already exists
-  const existing = await prisma.user.findUnique({ where: { email } })
+  const existing = await findUserByEmail(email)
   if (existing) {
     return NextResponse.json(
       { error: 'A player with this email already exists.' },

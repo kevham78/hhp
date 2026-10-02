@@ -4,7 +4,7 @@ import { POST as forgotPassword } from '@/app/api/auth/forgot-password/route'
 import { POST as resetPassword } from '@/app/api/auth/reset-password/route'
 import { POST as changePassword } from '@/app/api/auth/change-password/route'
 import { verifyCredentials } from '@/lib/auth/session'
-import { prisma, createSettings, createSeason, createUser, asUser, post } from './db'
+import { prisma, createSettings, createSeason, createUser, asUser, post, sentEmails } from './db'
 
 const DAY = 24 * 3600_000
 
@@ -47,6 +47,12 @@ describe('register (invite only)', () => {
     expect(await prisma.user.count({ where: { role: 'PLAYER' } })).toBe(0)
   })
 
+  it('treats an existing account with different capitalisation as already registered', async () => {
+    await createUser({ email: 'new@test.invalid' })
+    const res = await signUp((await invite('NEW@test.invalid')).token, 'NEW@test.invalid')
+    expect(res.status).toBe(400)
+  })
+
   it('rejects a short password', async () => {
     const inv = await invite('new@test.invalid')
     const res = await register(post({ name: 'X', email: 'new@test.invalid', password: 'short', token: inv.token }))
@@ -73,6 +79,16 @@ describe('forgot / reset password', () => {
     expect(await verifyCredentials({ email: 'real@test.invalid', password: 'brand-new-pass' }))
       .toMatchObject({ mustChangePassword: false })
     expect((await reset()).status).toBe(400)
+  })
+
+  it('works whatever capitalisation the player types', async () => {
+    await createUser({ email: 'Real@Test.invalid' })
+    await forgotPassword(post({ email: 'REAL@test.INVALID' }))
+    const { token, identifier } = await prisma.verificationToken.findFirstOrThrow()
+    expect(identifier).toBe('Real@Test.invalid')
+    const res = await resetPassword(post({ email: 'real@test.invalid', token, newPassword: 'brand-new-pass' }))
+    expect(res.status).toBe(200)
+    expect(sentEmails()).toHaveLength(0)   // Resend not configured in tests: link is logged instead
   })
 
   it('rejects expired or wrong links', async () => {

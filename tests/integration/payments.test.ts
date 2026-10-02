@@ -47,6 +47,22 @@ describe('GET /api/payments', () => {
     expect(body.suicidePots).toEqual({ winner: 15, loser: 15 })
   })
 
+  it('only counts dues paid this season — a new season starts fresh', async () => {
+    vi.setSystemTime(new Date('2026-10-12T12:00:00Z'))
+    const p = await createUser({ seasonId: season.id })
+    const admin = await createUser({ role: 'ADMIN' })
+    const lastSeason = await createSeason({ active: false })
+    await prisma.payment.create({ data: {
+      playerId: p.id, seasonId: lastSeason.id, type: 'DUES_PAID', amount: 50,
+      description: 'paid last season', createdBy: admin.id } })
+
+    asUser(admin)
+    await POST(post({ playerId: p.id, amount: 5 }))
+
+    expect(await playerRow(p.id)).toMatchObject({ duesOwed: 10, paid: 5, netBalance: 5 })
+    expect((await prisma.payment.findFirstOrThrow({ where: { amount: 5 } })).seasonId).toBe(season.id)
+  })
+
   it('rejects a zero or negative payment', async () => {
     asUser(await createUser({ role: 'ADMIN' }))
     const p = await createUser()

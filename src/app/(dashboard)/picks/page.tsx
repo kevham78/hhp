@@ -128,6 +128,12 @@ await addMissingGames(weekData, saturday, sunday)
 const satDate = new Date(weekData.saturdayDate as Date)
 const sunDate = new Date(weekData.sundayDate as Date)
 
+  // Submitted = has picks and none are still drafts
+  const isSubmitted = existingPicks.length > 0 && existingPicks.every(p => !p.isDraft)
+  const submittedAt = isSubmitted
+    ? new Date(Math.max(...existingPicks.map(p => (p.submittedAt ?? p.updatedAt).getTime()))).toISOString()
+    : null
+
   const isOpen = process.env.NODE_ENV === 'development'
     ? true
     : new Date() < new Date(weekData.picksDeadline)
@@ -144,6 +150,8 @@ const sunDate = new Date(weekData.sundayDate as Date)
       isOpen={isOpen}
       winnerTeamsUsed={suicideStatus?.winnerTeamsUsed ?? []}
       loserTeamsUsed={suicideStatus?.loserTeamsUsed   ?? []}
+      isSubmitted={isSubmitted}
+      submittedAt={submittedAt}
     />
   )
 }
