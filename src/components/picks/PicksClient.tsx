@@ -476,8 +476,9 @@ function handleRandomPicks() {
       )}
       {/* Confirmation bubble */}
       {toast && (
-        <div role="status" className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full
-                        bg-green-600 text-white font-bold shadow-lg animate-fade-in">
+        <div role="status" className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full
+                        whitespace-nowrap text-sm sm:text-base bg-green-600 text-white font-bold
+                        shadow-lg animate-fade-in">
           {toast}
         </div>
       )}
