@@ -13,7 +13,7 @@ export default async function StandingsPage() {
       <div>
         <h1 className="text-2xl font-black text-white">Standings 📊</h1>
         <p className="text-white/40 text-sm mt-1">
-          Season standings and weekly history
+          Season standings, monthly points and weekly history
         </p>
       </div>
       <StandingsClient />

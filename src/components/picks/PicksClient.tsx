@@ -35,6 +35,9 @@ interface PicksClientProps {
   isOpen:           boolean
   winnerTeamsUsed:  string[]
   loserTeamsUsed:   string[]
+  inWinnerPool:     boolean        // false once eliminated from that pool
+  inLoserPool:      boolean
+  winnerStrikes:    number
   isSubmitted:      boolean        // all saved picks are submitted (not drafts)
   submittedAt:      string | null  // when they were last submitted
 }
@@ -64,6 +67,9 @@ export default function PicksClient({
   isOpen,
   winnerTeamsUsed,
   loserTeamsUsed,
+  inWinnerPool,
+  inLoserPool,
+  winnerStrikes,
   isSubmitted,
   submittedAt,
 }: PicksClientProps) {
@@ -146,8 +152,10 @@ const loserSuicideTeam = state.suicide.loser
   const tiebreakerCount = Object.keys(state.tiebreakers).length
   const allTiebreakers  = tiebreakerCount === 3
 
-const hasSuicideWinner = !!state.suicide.winner
-const hasSuicideLoser  = !!state.suicide.loser
+// Only the pools the player is still in need a pick
+const inAnyPool        = inWinnerPool || inLoserPool
+const hasSuicideWinner = !inWinnerPool || !!state.suicide.winner
+const hasSuicideLoser  = !inLoserPool  || !!state.suicide.loser
 const allSuicide       = hasSuicideWinner && hasSuicideLoser
 
   const canSubmit = allPicked && allTiebreakers && allSuicide
@@ -314,9 +322,11 @@ function handleRandomPicks() {
           <span className={`status-pill ${allTiebreakers ? 'status-pill-green' : 'status-pill-muted'}`}>
             {tiebreakerCount}/3 tiebreakers
           </span>
+          {inAnyPool && (
           <span className={`status-pill ${allSuicide ? 'status-pill-green' : 'status-pill-muted'}`}>
             Suicide {allSuicide ? '✓' : '○'}
           </span>
+          )}
         </div>
       </div>
 
@@ -422,12 +432,16 @@ function handleRandomPicks() {
       )}
 
       {/* ── PHASE 3: SUICIDE ──────────────── */}
-      {allPicked && allTiebreakers && (
+      {allPicked && allTiebreakers && inAnyPool && (
         <>
           <PhaseBanner
             phase={3}
             title="Suicide Pool Picks"
-            subtitle="Pick one team to win and one team to lose — choose wisely, no repeats allowed!"
+            subtitle={
+              inWinnerPool && inLoserPool ? 'Pick one team to win and one team to lose — choose wisely, no repeats allowed!'
+              : inWinnerPool ? 'Pick one team to win — choose wisely, no repeats allowed!'
+              : 'Pick one team to lose — choose wisely, no repeats allowed!'
+            }
             complete={allSuicide}
           />
           <SuicidePanel
@@ -438,6 +452,9 @@ function handleRandomPicks() {
   loserSuicideTeam={loserSuicideTeam}
   winnerTeamsUsed={winnerTeamsUsed}
   loserTeamsUsed={loserTeamsUsed}
+  inWinnerPool={inWinnerPool}
+  inLoserPool={inLoserPool}
+  winnerStrikes={winnerStrikes}
   onSelect={handleSuicide}
   isLocked={!isOpen}
 />

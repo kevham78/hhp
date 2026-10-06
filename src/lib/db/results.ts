@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { getWeekendResults } from '@/lib/api/nhl'
+import { STRIKES_TO_ELIMINATE } from '@/lib/suicide'
+import { monthKey, monthLabel } from '@/lib/months'
 
 // ─────────────────────────────────────────────
 // Confirm a week's results: fetch final NHL
@@ -24,6 +26,87 @@ function resolveTiebreaker(tiedPlayers: any[]): any | null {
     if (withCorrect.length > 1)  remaining = withCorrect
   }
   return null
+}
+
+// ─────────────────────────────────────────────
+// Close finished months: the top points total for
+// the month wins the monthly pot (monthly prize x
+// weeks played that month); a tie splits it and
+// each tied player gets a monthly win.
+//
+// A month is finished once the week on its last
+// Saturday is confirmed, or the season ends. Any
+// earlier month that never closed (e.g. its last
+// weekend had no games) closes with it.
+// ─────────────────────────────────────────────
+
+async function closeFinishedMonths(
+  week: { id: string; saturdayDate: Date },
+  season: { id: string; endDate: Date },
+  monthlyPrize: number,
+  adminId: string | null,
+) {
+  const nextSaturday = new Date(week.saturdayDate.getTime() + 7 * 86_400_000)
+  const lastOfMonth  = monthKey(nextSaturday) !== monthKey(week.saturdayDate)
+                    || nextSaturday > season.endDate
+
+  const completed = await prisma.week.findMany({
+    where:   { seasonId: season.id, status: 'COMPLETED' },
+    orderBy: { saturdayDate: 'asc' },
+  })
+  const thisMonth = monthKey(week.saturdayDate)
+  const months = [...new Set(completed.map(w => monthKey(w.saturdayDate)))]
+    .filter(m => m < thisMonth || (m === thisMonth && lastOfMonth))
+
+  for (const month of months) {
+    const [year, mon] = month.split('-').map(Number)
+    const closed = await prisma.monthlyResult.count({ where: { seasonId: season.id, year, month: mon } })
+    if (closed > 0) continue
+
+    const monthWeeks = completed.filter(w => monthKey(w.saturdayDate) === month)
+    const stats = await prisma.weeklyStat.findMany({ where: { weekId: { in: monthWeeks.map(w => w.id) } } })
+    const points: Record<string, number> = {}
+    for (const s of stats) points[s.userId] = (points[s.userId] ?? 0) + s.points
+
+    const top       = Math.max(...Object.values(points), 0)
+    const winnerIds = Object.keys(points).filter(id => points[id] === top)
+    const isSplit   = winnerIds.length > 1
+    const pot       = monthlyPrize * monthWeeks.length
+    const share     = winnerIds.length > 0 ? pot / winnerIds.length : 0
+    const lastWeek  = monthWeeks[monthWeeks.length - 1]
+
+    for (const [userId, total] of Object.entries(points)) {
+      const isWinner = winnerIds.includes(userId)
+      await prisma.monthlyResult.create({
+        data: {
+          seasonId: season.id, userId, year, month: mon, points: total,
+          isWinner, isSplit: isWinner && isSplit, prizeAmount: isWinner ? share : 0,
+        },
+      })
+    }
+
+    for (const userId of winnerIds) {
+      // Attached to the month's last week so it counts toward the season's winnings
+      await prisma.payment.create({
+        data: {
+          seasonId:    season.id,
+          playerId:    userId,
+          weekId:      lastWeek.id,
+          type:        'MONTHLY_WINNING',
+          amount:      share,
+          description: isSplit
+            ? `${monthLabel(month)} prize (split ${winnerIds.length} ways)`
+            : `${monthLabel(month)} winner`,
+          recipientId: userId,
+          createdBy:   adminId ?? userId,
+        },
+      })
+      await prisma.seasonStat.update({
+        where: { userId_seasonId: { userId, seasonId: season.id } },
+        data:  { monthlyWins: { increment: 1 } },
+      })
+    }
+  }
 }
 
 export async function confirmWeekResults(weekId: string): Promise<ConfirmResult> {
@@ -248,11 +331,11 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
         const pick = poolPicks.find(p => p.userId === status.userId)
 
         if (!pick) {
-          // No pick — knocked out (single elimination)
+          // No pick — counts as a strike
           const strikes = poolType === 'WINNER'
             ? status.winnerPoolStrikes + 1
             : status.loserPoolStrikes + 1
-          const eliminated = strikes >= 1
+          const eliminated = strikes >= STRIKES_TO_ELIMINATE[poolType]
 
           await prisma.suicideStatus.update({
             where: { id: status.id },
@@ -296,11 +379,11 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
             },
           })
         } else {
-          // Wrong — knocked out (single elimination)
+          // Wrong — a strike; out once the pool's limit is reached
           const strikes = poolType === 'WINNER'
             ? status.winnerPoolStrikes + 1
             : status.loserPoolStrikes + 1
-          const eliminated = strikes >= 1
+          const eliminated = strikes >= STRIKES_TO_ELIMINATE[poolType]
 
           await prisma.suicideStatus.update({
             where: { id: status.id },
@@ -418,6 +501,9 @@ export async function confirmWeekResults(weekId: string): Promise<ConfirmResult>
         })
       }
     }
+
+    // ── Monthly prize, if this finishes a month ──
+    await closeFinishedMonths(week, season, settings.monthlyPrize, adminUser?.id ?? null)
 
     // ── Mark week complete ─────────────────────
     await prisma.week.update({

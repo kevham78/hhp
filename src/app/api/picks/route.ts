@@ -162,6 +162,13 @@ for (const [nhlGameId, pickedTeam] of Object.entries(picks)) {
 }
 
 // ── Save suicide picks ──────────────────────
+// Only for pools the player is still in
+const suicideStatus = await prisma.suicideStatus.findUnique({
+  where: { userId_seasonId: { userId, seasonId: week.seasonId } },
+})
+if (suicideStatus?.winnerPoolEliminated) suicide.winner = null
+if (suicideStatus?.loserPoolEliminated)  suicide.loser  = null
+
 if (suicide.winner) {
   const winnerGame = await prisma.game.findFirst({
     where: { weekId: week.id, nhlGameId: suicide.winner },

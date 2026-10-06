@@ -112,9 +112,11 @@ export default async function HelpPage() {
           <li><strong className="text-white">Loser Pool</strong> — pick one team you picked to LOSE.</li>
         </ul>
         <p>
-          Each pool is <strong className="text-white">single elimination</strong> —
-          one wrong pick (or a missed pick) and you're out of that pool (being out of one doesn't
-          affect the other). You can never pick the same team twice in the same
+          A wrong pick (or a missed pick) is a strike. The{' '}
+          <strong className="text-white">Winner Pool</strong> knocks you out on your 2nd strike;
+          the <strong className="text-white">Loser Pool</strong> is one and done. Being out of one
+          pool doesn't affect the other, and once you're out of a pool you won't be asked for that
+          pick on My Picks. You can never pick the same team twice in the same
           pool during the season. Last player standing in each pool takes the
           pot; if everyone still in gets eliminated the same week, the pot
           splits between them. Check the <strong className="text-white">Suicide Pool</strong>{' '}
@@ -126,7 +128,7 @@ export default async function HelpPage() {
         <p>Dues are <strong className="text-white">${weeklyDues.toFixed(2)}/week</strong>, split up as:</p>
         <ul className="list-disc list-inside space-y-1 ml-1">
           <li>${weeklyPrize.toFixed(2)} to that week's points winner</li>
-          <li>${monthlyPrize.toFixed(2)}/week added to the monthly pot</li>
+          <li>${monthlyPrize.toFixed(2)}/week added to the monthly pot — most points that month wins it (ties split it, and each counts as a monthly win)</li>
           <li>${suicideWinnerPrize.toFixed(2)}/week added to the Suicide Winner pot</li>
           <li>${suicideLoserPrize.toFixed(2)}/week added to the Suicide Loser pot</li>
         </ul>
@@ -139,7 +141,7 @@ export default async function HelpPage() {
 
       <Section icon={BarChart3} title="Where to Find Things">
         <ul className="list-disc list-inside space-y-1 ml-1">
-          <li><strong className="text-white">Standings</strong> — season-long points and rankings for everyone.</li>
+          <li><strong className="text-white">Standings</strong> — season, month-by-month and week-by-week points. Season rank goes by total money won (weekly, monthly and suicide prizes), then weekly wins, then monthly wins, then points; anyone still level shares the rank.</li>
           <li><strong className="text-white">My Picks</strong> — make or update this week's picks before the deadline.</li>
           <li><strong className="text-white">Suicide Pool</strong> — every player's winner/loser picks, week by week.</li>
           <li><strong className="text-white">Results</strong> — the full picks grid once a week is revealed.</li>

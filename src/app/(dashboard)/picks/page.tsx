@@ -83,6 +83,9 @@ await addMissingGames(weekData, saturday, sunday)
     }),
   ])
 
+  const inWinnerPool = !(suicideStatus?.winnerPoolEliminated ?? false)
+  const inLoserPool  = !(suicideStatus?.loserPoolEliminated  ?? false)
+
   // Shape existing picks into PicksState
   const picksState: PicksState = {
     picks: Object.fromEntries(
@@ -104,6 +107,7 @@ await addMissingGames(weekData, saturday, sunday)
     ),
     suicide: {
       winner: (() => {
+        if (!inWinnerPool) return null
         const wp = existingSuicide.find(s => s.poolType === 'WINNER')
         if (!wp) return null
         const game = weekData.games.find(g =>
@@ -112,6 +116,7 @@ await addMissingGames(weekData, saturday, sunday)
         return game ? game.nhlGameId : null
       })(),
       loser: (() => {
+        if (!inLoserPool) return null
         const lp = existingSuicide.find(s => s.poolType === 'LOSER')
         if (!lp) return null
         const game = weekData.games.find(g =>
@@ -150,6 +155,9 @@ const sunDate = new Date(weekData.sundayDate as Date)
       isOpen={isOpen}
       winnerTeamsUsed={suicideStatus?.winnerTeamsUsed ?? []}
       loserTeamsUsed={suicideStatus?.loserTeamsUsed   ?? []}
+      inWinnerPool={inWinnerPool}
+      inLoserPool={inLoserPool}
+      winnerStrikes={suicideStatus?.winnerPoolStrikes ?? 0}
       isSubmitted={isSubmitted}
       submittedAt={submittedAt}
     />

@@ -99,8 +99,9 @@ export async function GET() {
         seasonId: season.id,
         status:   'COMPLETED',
         saturdayDate: {
-          gte: new Date(currentYear, currentMonth - 1, 1),
-          lt:  new Date(currentYear, currentMonth, 1),
+          // Saturdays are stored as UTC midnight — compare in UTC
+          gte: new Date(Date.UTC(currentYear, currentMonth - 1, 1)),
+          lt:  new Date(Date.UTC(currentYear, currentMonth, 1)),
         },
       },
     })

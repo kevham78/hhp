@@ -73,6 +73,20 @@ describe('POST /api/picks', () => {
     expect(suicide.find(s => s.poolType === 'LOSER')!.pickedTeam).toBe('BOS')
   })
 
+  it('ignores suicide picks for a pool the player is out of', async () => {
+    await prisma.suicideStatus.updateMany({ where: { userId: player.id }, data: { loserPoolEliminated: true, loserPoolStrikes: 1 } })
+    const res = await save({
+      picks:       { 9001: 'TOR', 9002: 'NYR' },
+      tiebreakers: { 9001: 1, 9002: 2 },
+      suicide:     { winner: '9001', loser: '9002' },
+      isDraft:     false,
+    })
+    expect(res.status).toBe(200)
+
+    const suicide = await prisma.suicidePick.findMany({ where: { userId: player.id } })
+    expect(suicide.map(s => s.poolType)).toEqual(['WINNER'])
+  })
+
   it('refuses any change after the deadline — including drafts', async () => {
     vi.setSystemTime(AFTER_DEADLINE)
     expect((await save({ picks: { 9001: 'TOR' }, isDraft: false })).status).toBe(400)

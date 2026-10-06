@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { NHLGameFromAPI, getGameLabel } from '@/lib/api/nhl'
+import { STRIKES_TO_ELIMINATE } from '@/lib/suicide'
 
 interface PickedTeam {
   gameId: string
@@ -30,6 +31,9 @@ interface SuicidePanelProps {
   loserSuicideTeam:  string | null
   winnerTeamsUsed:   string[]
   loserTeamsUsed:    string[]
+  inWinnerPool:      boolean
+  inLoserPool:       boolean
+  winnerStrikes:     number
   onSelect:          (type: 'winner' | 'loser', gameId: string) => void
   isLocked:          boolean
 }
@@ -93,22 +97,48 @@ export default function SuicidePanel({
   loserSuicideTeam,
   winnerTeamsUsed,
   loserTeamsUsed,
+  inWinnerPool,
+  inLoserPool,
+  winnerStrikes,
   onSelect,
   isLocked,
 }: SuicidePanelProps) {
+  const onLastStrike = winnerStrikes === STRIKES_TO_ELIMINATE.WINNER - 1
+
   return (
     <div className="hhp-card space-y-4">
       <p className="text-white/40 text-xs">
-        Select one team you're most confident will{' '}
-        <span className="text-green-400 font-semibold">win</span> and one team
-        you're most confident will{' '}
-        <span className="text-red-400 font-semibold">lose</span>.
+        {inWinnerPool && <>
+          Select one team you're most confident will{' '}
+          <span className="text-green-400 font-semibold">win</span>
+        </>}
+        {inWinnerPool && inLoserPool && ' and one team'}
+        {!inWinnerPool && 'Select one team'}
+        {inLoserPool && <>
+          {' '}you're most confident will{' '}
+          <span className="text-red-400 font-semibold">lose</span>
+        </>}.
         You cannot pick the same team twice across the season.
       </p>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* A pool the player is out of gets no pick */}
+      {(!inWinnerPool || !inLoserPool) && (
+        <p className="text-white/40 text-xs">
+          You're out of the {inWinnerPool ? 'Loser' : 'Winner'} Pool, so there's no{' '}
+          {inWinnerPool ? 'loser' : 'winner'} pick for you this week.
+        </p>
+      )}
+      {inWinnerPool && onLastStrike && (
+        <p className="text-yellow-400 text-xs">
+          ⚠️ You have {winnerStrikes} strike{winnerStrikes > 1 ? 's' : ''} in the Winner Pool —
+          one more wrong pick and you're out.
+        </p>
+      )}
+
+      <div className={`grid gap-4 ${inWinnerPool && inLoserPool ? 'grid-cols-2' : 'grid-cols-1'}`}>
 
         {/* Winner suicide */}
+        {inWinnerPool && (
         <div>
           <p className="text-green-400 text-xs font-bold uppercase tracking-widest mb-2">
             🏆 Winner Pick
@@ -136,8 +166,10 @@ export default function SuicidePanel({
             })}
           </div>
         </div>
+        )}
 
         {/* Loser suicide */}
+        {inLoserPool && (
         <div>
           <p className="text-red-400 text-xs font-bold uppercase tracking-widest mb-2">
             💀 Loser Pick
@@ -165,6 +197,7 @@ export default function SuicidePanel({
             })}
           </div>
         </div>
+        )}
 
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db/prisma'
+import { monthKey } from '@/lib/months'
 
 export async function GET() {
   try {
@@ -41,14 +42,27 @@ export async function GET() {
       },
     })
 
+    // Prize money paid out this season (weekly, monthly and suicide) —
+    // the same winnings the Money page shows
+    const winnings = await prisma.payment.findMany({
+      where: { type: { not: 'DUES_PAID' }, week: { seasonId: season.id } },
+    })
+
     // Get monthly results
     const monthlyResults = await prisma.monthlyResult.findMany({
       where:   { seasonId: season.id },
       orderBy: { year: 'asc' },
     })
 
+    // Completed weeks grouped by month, oldest first
+    const monthWeeks = new Map<string, typeof weeks>()
+    for (const week of weeks) {
+      const key = monthKey(week.saturdayDate)
+      monthWeeks.set(key, [...(monthWeeks.get(key) ?? []), week])
+    }
+
     // Build standings
-    const standings = players.map(player => {
+    const unranked = players.map(player => {
       const stat = seasonStats.find(s => s.userId === player.id)
 
       // Weekly results for this player
@@ -71,16 +85,39 @@ export async function GET() {
         r => r.userId === player.id && r.isWinner
       )
 
+      // Points per month, from that month's weeks
+      const playerMonths = [...monthWeeks.keys()].map(month => ({
+        month,
+        points: playerWeekly
+          .filter(w => monthKey(w.satDate) === month)
+          .reduce((sum, w) => sum + w.points, 0),
+      }))
+
       return {
         userId:       player.id,
         name:         player.name,
         image:        player.image,
+        moneyWon:     winnings.filter(p => p.recipientId === player.id).reduce((sum, p) => sum + p.amount, 0),
         totalPoints:  stat?.totalPoints ?? 0,
         weeklyWins:   stat?.weeklyWins  ?? 0,
         monthlyWins:  playerMonthly.length,
         weeklyResults: playerWeekly,
+        monthlyPoints: playerMonths,
       }
-    }).sort((a, b) => b.totalPoints - a.totalPoints)
+    })
+
+    // Rank by money won, then weekly wins, then monthly wins, then points.
+    // Players equal on all four share the rank, and the next rank is
+    // skipped (1, 2, 2, 4).
+    type Standing = typeof unranked[number]
+    const compare = (a: Standing, b: Standing) =>
+      b.moneyWon - a.moneyWon || b.weeklyWins - a.weeklyWins
+      || b.monthlyWins - a.monthlyWins || b.totalPoints - a.totalPoints
+    const ranked = [...unranked].sort((a, b) => compare(a, b) || (a.name ?? '').localeCompare(b.name ?? ''))
+    const standings = ranked.map((player, i) => {
+      const rank = ranked.findIndex(p => compare(p, player) === 0) + 1
+      return { ...player, rank, isTied: ranked.some((p, j) => j !== i && compare(p, player) === 0) }
+    })
 
     // Weekly summary for history table
     const weekHistory = weeks.map(week => {
@@ -102,10 +139,32 @@ export async function GET() {
       }
     })
 
+    // Monthly summary. A month that's been closed (see closeFinishedMonths)
+    // has recorded winners; until then its top scorers are only leading.
+    const monthHistory = [...monthWeeks].map(([month, monthWeekList]) => {
+      const [year, mon] = month.split('-').map(Number)
+      const recorded  = monthlyResults.filter(r => r.year === year && r.month === mon)
+      const totals    = standings.map(p => ({ userId: p.userId, name: p.name, points: p.monthlyPoints.find(m => m.month === month)!.points }))
+      const topPoints = totals.reduce((max, t) => Math.max(max, t.points), 0)
+      const leaders   = recorded.length > 0
+        ? totals.filter(t => recorded.some(r => r.userId === t.userId && r.isWinner))
+        : totals.filter(t => t.points === topPoints && topPoints > 0)
+      return {
+        month,
+        weekCount:   monthWeekList.length,
+        topPoints,
+        leaderIds:   leaders.map(l => l.userId),
+        leaderNames: leaders.map(l => l.name ?? ''),
+        isTied:      leaders.length > 1,
+        inProgress:  recorded.length === 0,
+      }
+    })
+
     return NextResponse.json({
       seasonName: season.name,
       standings,
       weekHistory,
+      monthHistory,
       totalWeeks: weeks.length,
     })
   } catch (err) {

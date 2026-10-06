@@ -242,9 +242,9 @@ model SuicideStatus {
   userId                String
   seasonId              String
   winnerPoolEliminated  Boolean  @default(false)
-  winnerPoolStrikes     Int      @default(0) // 0 or 1 (single elimination)
+  winnerPoolStrikes     Int      @default(0) // out at 2 (STRIKES_TO_ELIMINATE in src/lib/suicide.ts)
   loserPoolEliminated   Boolean  @default(false)
-  loserPoolStrikes      Int      @default(0)
+  loserPoolStrikes      Int      @default(0) // out at 1
 
   // Track which teams already picked (no repeats)
   winnerTeamsUsed       String[] // array of team codes
@@ -341,7 +341,7 @@ model SeasonStat {
 model Payment {
   id            String        @id @default(cuid())
   playerId      String
-  weekId        String?       // null for monthly payments
+  weekId        String?       // week it was won (monthly prize: the month's last week); null for dues
   seasonId      String?       // season the payment belongs to (dues reset each season)
   type          PaymentType
   amount        Float
