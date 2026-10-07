@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Trophy, Calendar, CalendarDays } from 'lucide-react'
 import Link from 'next/link'
+import { formatMoney as money } from '@/lib/standings'
 
 interface WeeklyResult {
   weekId:     string
@@ -54,9 +55,6 @@ interface StandingsData {
   monthHistory: MonthHistory[]
   totalWeeks:  number
 }
-
-// $30, $7.50
-const money = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`
 
 export default function StandingsClient() {
   const [data,    setData]    = useState<StandingsData | null>(null)

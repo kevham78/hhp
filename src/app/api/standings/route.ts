@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db/prisma'
 import { monthKey } from '@/lib/months'
+import { rankPlayers } from '@/lib/standings'
 
 export async function GET() {
   try {
@@ -106,18 +107,7 @@ export async function GET() {
       }
     })
 
-    // Rank by money won, then weekly wins, then monthly wins, then points.
-    // Players equal on all four share the rank, and the next rank is
-    // skipped (1, 2, 2, 4).
-    type Standing = typeof unranked[number]
-    const compare = (a: Standing, b: Standing) =>
-      b.moneyWon - a.moneyWon || b.weeklyWins - a.weeklyWins
-      || b.monthlyWins - a.monthlyWins || b.totalPoints - a.totalPoints
-    const ranked = [...unranked].sort((a, b) => compare(a, b) || (a.name ?? '').localeCompare(b.name ?? ''))
-    const standings = ranked.map((player, i) => {
-      const rank = ranked.findIndex(p => compare(p, player) === 0) + 1
-      return { ...player, rank, isTied: ranked.some((p, j) => j !== i && compare(p, player) === 0) }
-    })
+    const standings = rankPlayers(unranked)
 
     // Weekly summary for history table
     const weekHistory = weeks.map(week => {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DollarSign, TrendingUp, TrendingDown, Trophy, Plus, X } from 'lucide-react'
+import { DollarSign, TrendingUp, TrendingDown, Plus, X } from 'lucide-react'
 
 interface Transaction {
   id:          string
@@ -20,7 +20,6 @@ interface PlayerFinancial {
   winnings:      number
   paid:          number
   netBalance:    number
-  monthlyPoints: number
   monthlyWins:   number
   transactions:  Transaction[]
 }
@@ -31,7 +30,6 @@ interface PaymentsData {
   weeksOwed:        number
   weeklyDues:       number
   playerFinancials: PlayerFinancial[]
-  monthlyStandings: PlayerFinancial[]
   monthlyPot:       number
   currentMonth:     number
   currentYear:      number
@@ -171,34 +169,6 @@ export default function PaymentsClient({ isAdmin }: { isAdmin: boolean }) {
           <p className="text-white/30 text-xs mt-1">
             ${data.weeklyDues}/week
           </p>
-        </div>
-      </div>
-
-      {/* ── MONTHLY STANDINGS ────────────────── */}
-      <div className="hhp-card">
-        <h2 className="text-white font-bold mb-4 flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-hhp-gold" />
-          {MONTH_NAMES[data.currentMonth]} Standings
-          <span className="text-white/30 text-sm font-normal ml-1">
-            (pot: ${data.monthlyPot.toFixed(2)})
-          </span>
-        </h2>
-        <div className="space-y-2">
-          {data.monthlyStandings.map((player, i) => (
-            <div key={player.userId}
-                 className="flex items-center gap-3 py-2 border-b
-                            border-hhp-navy-light/50 last:border-0">
-              <span className="text-white/30 text-sm w-5 text-center">
-                {i + 1}
-              </span>
-              <div className="flex-1">
-                <p className="text-white text-sm font-semibold">{player.name}</p>
-              </div>
-              <span className="text-white font-black">
-                {player.monthlyPoints} pts
-              </span>
-            </div>
-          ))}
         </div>
       </div>
 

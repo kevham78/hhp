@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db/prisma'
 import AdminDashboardClient from '@/components/admin/AdminDashboardClient'
+import { rankPlayers } from '@/lib/standings'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,13 +41,26 @@ export default async function AdminDashboardPage() {
       })
     : []
 
-  // Season standings
-  const seasonStats = season
-    ? await prisma.seasonStat.findMany({
-        where:   { seasonId: season.id },
-        include: { user: true },
-        orderBy: { totalPoints: 'desc' },
-      })
+  // Season standings — ranked the same way as the Standings page
+  const [seasonStats, winnings, monthlyWins] = season
+    ? await Promise.all([
+        prisma.seasonStat.findMany({ where: { seasonId: season.id } }),
+        prisma.payment.findMany({ where: { type: { not: 'DUES_PAID' }, week: { seasonId: season.id } } }),
+        prisma.monthlyResult.findMany({ where: { seasonId: season.id, isWinner: true } }),
+      ])
+    : [[], [], []]
+  const standings = season && seasonStats.length > 0
+    ? rankPlayers(players.map(p => {
+        const stat = seasonStats.find(s => s.userId === p.id)
+        return {
+          userId:      p.id,
+          name:        p.name ?? '',
+          moneyWon:    winnings.filter(w => w.recipientId === p.id).reduce((sum, w) => sum + w.amount, 0),
+          weeklyWins:  stat?.weeklyWins  ?? 0,
+          monthlyWins: monthlyWins.filter(m => m.userId === p.id).length,
+          totalPoints: stat?.totalPoints ?? 0,
+        }
+      }))
     : []
 
   // Monthly pot
@@ -114,11 +128,12 @@ export default async function AdminDashboardPage() {
           name: p.name ?? '',
         }))}
         submittedUserIds={submittedThisWeek.map(p => p.userId)}
-        seasonStats={seasonStats.map(s => ({
-          userId:      s.userId,
-          name:        s.user?.name ?? '',
-          totalPoints: s.totalPoints,
-          weeklyWins:  s.weeklyWins,
+        seasonStats={standings.map(s => ({
+          userId:   s.userId,
+          name:     s.name,
+          moneyWon: s.moneyWon,
+          rank:     s.rank,
+          isTied:   s.isTied,
         }))}
         monthlyPot={monthlyPot}
         suicidePots={{

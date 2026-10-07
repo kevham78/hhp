@@ -93,7 +93,7 @@ export async function GET() {
     const currentMonth = now.getMonth() + 1
     const currentYear  = now.getFullYear()
 
-    // Monthly points — sum weekly points for games this month
+    // Weeks played this month (sizes the monthly pot)
     const currentMonthWeeks = await prisma.week.findMany({
       where: {
         seasonId: season.id,
@@ -106,17 +106,6 @@ export async function GET() {
       },
     })
 
-    const currentMonthStats = await prisma.weeklyStat.findMany({
-      where: {
-        weekId: { in: currentMonthWeeks.map(w => w.id) },
-      },
-    })
-
-    // Build monthly points per player for current month
-    const monthlyPoints: Record<string, number> = {}
-    for (const stat of currentMonthStats) {
-      monthlyPoints[stat.userId] = (monthlyPoints[stat.userId] ?? 0) + stat.points
-    }
 
     // Get suicide pool state
     const suicidePools = await prisma.suicidePoolState.findMany({
@@ -183,7 +172,6 @@ export async function GET() {
         winnings,
         paid,
         netBalance,
-        monthlyPoints:   monthlyPoints[player.id] ?? 0,
         monthlyWins:     monthlyWins.length,
         transactions,
       }
@@ -192,17 +180,12 @@ export async function GET() {
     // Monthly pot size
     const monthlyPot = currentMonthWeeks.length * (settings?.monthlyPrize ?? 5)
 
-    // Monthly standings for current month
-    const monthlyStandings = [...playerFinancials]
-      .sort((a, b) => b.monthlyPoints - a.monthlyPoints)
-
     return NextResponse.json({
       seasonId:         season.id,
       completedWeeks,
       weeksOwed,
       weeklyDues,
       playerFinancials,
-      monthlyStandings,
       monthlyPot,
       currentMonth,
       currentYear,

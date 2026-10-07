@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { formatMoney } from '@/lib/standings'
 import {
   Users, Trophy, DollarSign, Settings,
   AlertTriangle, CheckCircle, Clock,
@@ -20,10 +21,11 @@ interface AdminDashboardProps {
   players:          { id: string; name: string }[]
   submittedUserIds: string[]
   seasonStats: {
-    userId:      string
-    name:        string
-    totalPoints: number
-    weeklyWins:  number
+    userId:   string
+    name:     string
+    moneyWon: number
+    rank:     number   // shared by tied players
+    isTied:   boolean
   }[]
   monthlyPot:          number
   suicidePots:         { winner: number; loser: number }
@@ -304,15 +306,16 @@ export default function AdminDashboardClient({
             </Link>
           </div>
           <div className="space-y-2">
-            {seasonStats.map((stat, i) => (
+            {seasonStats.map(stat => (
               <div key={stat.userId}
                    className="flex items-center gap-3 py-1.5">
-                <span className="text-white/30 text-sm w-5 text-center">
-                  {i + 1}
+                <span className="text-white/30 text-sm w-7 text-center whitespace-nowrap"
+                      title={stat.isTied ? `Tied for ${stat.rank}` : undefined}>
+                  {stat.isTied ? 'T' : ''}{stat.rank}
                 </span>
                 <span className="text-white text-sm flex-1">{stat.name}</span>
-                <span className="text-white font-black">{stat.totalPoints}</span>
-                <span className="text-white/30 text-xs">pts</span>
+                <span className="text-white font-black">{formatMoney(stat.moneyWon)}</span>
+                <span className="text-white/30 text-xs">won</span>
               </div>
             ))}
           </div>
