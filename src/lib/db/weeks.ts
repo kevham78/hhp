@@ -47,14 +47,6 @@ function gameData(weekId: string, game: WeekendGame, gameDay: 'SATURDAY' | 'SUND
   }
 }
 
-async function saveGame(weekId: string, game: WeekendGame, gameDay: 'SATURDAY' | 'SUNDAY') {
-  try {
-    await prisma.game.create({ data: gameData(weekId, game, gameDay) })
-  } catch (err) {
-    console.error(`Failed to save ${gameDay} game:`, game.id, err)
-  }
-}
-
 // ─────────────────────────────────────────────
 // A week's games are saved when the week is first created, but the
 // picks page lists whatever the NHL schedule shows now. If the NHL adds
@@ -91,7 +83,7 @@ export async function addMissingGames(
     for (const { game, day } of scheduled) {
       if (known.has(String(game.id))) continue
       console.log(`[Weeks] Adding game ${game.id} (${game.awayTeam.abbrev} @ ${game.homeTeam.abbrev}) missing from week ${week.id}`)
-      await tx.game.create({ data: gameData(week.id, game, day) })
+      await tx.game.createMany({ data: [gameData(week.id, game, day)], skipDuplicates: true })
       added = true
     }
     return added
@@ -141,31 +133,54 @@ export async function getOrCreateCurrentWeek() {
   const settings = await prisma.settings.findFirst({
     where: { id: 'default' },
   })
+  const deadline = getPicksDeadline(saturday, settings?.picksRevealTime ?? '14:00')
 
-  const deadline  = getPicksDeadline(saturday, settings?.picksRevealTime ?? '14:00')
-  const weekCount = await prisma.week.count({ where: { seasonId: season.id } })
-
-  // Create the week
-  const week = await prisma.week.create({
-    data: {
-      seasonId:      season.id,
-      weekNumber:    weekCount + 1,
-      saturdayDate:  satStart,
-      sundayDate:    new Date(new Date(sunday).setUTCHours(0, 0, 0, 0)),
-      picksDeadline: deadline,
-      status:        'OPEN',
-    },
-  })
-
-  // Fetch games from NHL API and save to DB
+  // Fetch games from NHL API (before the transaction, to keep it short)
   const { saturday: satGames, sunday: sunGames } = await getWeekendGames(saturday, sunday)
 
-  for (const game of satGames) await saveGame(week.id, game, 'SATURDAY')
-  for (const game of sunGames) await saveGame(week.id, game, 'SUNDAY')
+  // Create the week and all its games in one transaction. Previously the
+  // week was saved first and its games inserted one by one; a player
+  // opening My Picks in that window saw the games as "missing" and added
+  // them too, so week 2 ended up with every game twice. Inside the
+  // transaction nobody can see a half-built week, the lock stops two
+  // simultaneous first visits from both creating it, and the
+  // (weekId, nhlGameId) unique index is the last line of defence.
+  return prisma.$transaction(async tx => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'create-week:' + season.id}))`
 
-  return prisma.week.findUnique({
-    where:   { id: week.id },
-    include: { games: true },
+    const created = await tx.week.findFirst({
+      where: {
+        seasonId:     season.id,
+        saturdayDate: { gte: satStart, lte: satEnd },
+      },
+      include: { games: true },
+    })
+    if (created) return created
+
+    const weekCount = await tx.week.count({ where: { seasonId: season.id } })
+    const week = await tx.week.create({
+      data: {
+        seasonId:      season.id,
+        weekNumber:    weekCount + 1,
+        saturdayDate:  satStart,
+        sundayDate:    new Date(new Date(sunday).setUTCHours(0, 0, 0, 0)),
+        picksDeadline: deadline,
+        status:        'OPEN',
+      },
+    })
+
+    await tx.game.createMany({
+      data: [
+        ...satGames.map(game => gameData(week.id, game, 'SATURDAY')),
+        ...sunGames.map(game => gameData(week.id, game, 'SUNDAY')),
+      ],
+      skipDuplicates: true,
+    })
+
+    return tx.week.findUniqueOrThrow({
+      where:   { id: week.id },
+      include: { games: true },
+    })
   })
 }
 

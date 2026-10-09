@@ -189,6 +189,8 @@ model Game {
   week          Week       @relation(fields: [weekId], references: [id])
   picks         Pick[]
 
+  // A week can only list each NHL game once
+  @@unique([weekId, nhlGameId])
   @@map("games")
 }
 
