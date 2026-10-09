@@ -52,8 +52,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t hhp-app -f Dockerfile .
-      - run: docker build -t hhp-cron -f Dockerfile.cron .
+      - uses: docker/setup-buildx-action@v3
+      # Build both images (layers cached for the publish job below)
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          tags: hhp-app
+          load: true
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,scope=app,mode=max
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.cron
+          tags: hhp-cron
+          load: true
+          cache-from: type=gha,scope=cron
+          cache-to: type=gha,scope=cron,mode=max
       # The app image runs `prisma migrate deploy` at startup — make sure it
       # actually starts against an empty database (this caught nothing
       # before, which is how the Prisma 7 crash-loop reached the Synology).
@@ -68,3 +84,42 @@ jobs:
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3000/login && break; sleep 1; done
           docker logs app
           curl -sf -o /dev/null http://localhost:3000/login
+
+  # Publish the images the Synology deploys (docker compose pull).
+  # Only from main, and only after every check above has passed.
+  publish:
+    name: Publish images
+    needs: [checks, integration, docker]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/kevham78/hhp-app:latest
+            ghcr.io/kevham78/hhp-app:${{ github.sha }}
+          labels: org.opencontainers.image.source=https://github.com/kevham78/hhp
+          cache-from: type=gha,scope=app
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.cron
+          push: true
+          tags: |
+            ghcr.io/kevham78/hhp-cron:latest
+            ghcr.io/kevham78/hhp-cron:${{ github.sha }}
+          labels: org.opencontainers.image.source=https://github.com/kevham78/hhp
+          cache-from: type=gha,scope=cron

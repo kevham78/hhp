@@ -24,6 +24,11 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# NEXT_PUBLIC_* values are baked into the build, so they're set here
+# rather than read from .env (which is kept out of the image).
+ARG NEXT_PUBLIC_APP_URL=https://hhp.kevinhamilton.ca
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+
 RUN npm run build
 
 # ─────────────────────────────────────────────

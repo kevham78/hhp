@@ -24,13 +24,21 @@ services:
 
   # ─────────────────────────────────────────────
   # Next.js Application
+  # Built and tested by GitHub Actions; deploy with
+  #   docker compose pull && docker compose up -d
+  # (`docker compose up -d --build` still builds locally as a fallback.)
+  # Roll back to an earlier build with HHP_TAG=<commit sha> in .env.
   # ─────────────────────────────────────────────
   app:
+    image: ghcr.io/kevham78/hhp-app:${HHP_TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
     container_name: hhp_app
     restart: unless-stopped
+    # All of .env at runtime (secrets are not baked into the image);
+    # the entries under environment: below take precedence.
+    env_file: .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,11 +61,13 @@ services:
   # Runs as a separate lightweight service
   # ─────────────────────────────────────────────
   cron:
+    image: ghcr.io/kevham78/hhp-cron:${HHP_TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile.cron
     container_name: hhp_cron
     restart: unless-stopped
+    env_file: .env
     depends_on:
       postgres:
         condition: service_healthy

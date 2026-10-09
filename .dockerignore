@@ -1,6 +1,11 @@
 # Keep host build artifacts out of the image (the image installs its own).
-# .env is intentionally NOT ignored: NEXT_PUBLIC_* values are baked in at build time.
 node_modules
 .next
 .git
 tsconfig.tsbuildinfo
+
+# Secrets stay out of images: containers get .env at runtime via
+# env_file in docker-compose.yml. Images are built on GitHub (no .env).
+.env
+.env.*
+!.env.example

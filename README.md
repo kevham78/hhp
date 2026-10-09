@@ -111,6 +111,28 @@ cp .env.example .env
 docker compose up -d
 ```
 
+### Deploying an update
+
+Images are built by GitHub Actions, not on the Synology. Every push to `main`
+runs CI; when everything passes, the **Publish images** job pushes
+`ghcr.io/kevham78/hhp-app` and `hhp-cron` (tagged `latest` and the commit sha).
+Wait for the green check on GitHub, then on the Synology:
+
+```bash
+git pull                 # picks up docker-compose.yml changes
+docker compose pull      # download the new images (~1-2 min)
+docker compose up -d     # restart; the app runs any new migrations on startup
+docker logs hhp_app | head -20
+```
+
+Roll back to an earlier build: set `HHP_TAG=<full commit sha>` in `.env`, then
+`docker compose pull && docker compose up -d` (remove the line to go back to `latest`).
+Fallback if GitHub is unavailable: `docker compose up -d --build` builds on the Synology (slow).
+
+Containers read `.env` at runtime (`env_file` in `docker-compose.yml`); it is never
+copied into an image. `NEXT_PUBLIC_APP_URL` is baked in at build time
+(`ARG` in the `Dockerfile`, default `https://hhp.kevinhamilton.ca`).
+
 `docker-compose.yml` runs three services:
 - **postgres** — PostgreSQL 16
 - **app** — the Next.js app (standalone build, runs `prisma migrate deploy` on start)
