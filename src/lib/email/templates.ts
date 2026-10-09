@@ -209,11 +209,21 @@ export function picksReminderEmail({
 
 export function picksRevealEmail({
   weekNumber,
-  weekId,
+  autoPicked = null,
 }: {
-  weekNumber: number
-  weekId:     string
+  weekNumber:  number
+  // Did auto-pick make this player's picks? 'all', 'some' (filled gaps) or null
+  autoPicked?: 'all' | 'some' | null
 }): string {
+  const autoPickNotice = autoPicked
+    ? `
+    <p style="color:#e8c870;font-size:15px;font-weight:700;margin:0 0 20px;line-height:1.5;">
+      <strong>${autoPicked === 'all'
+        ? "Your picks were made by auto-pick this week because they weren't submitted before the deadline."
+        : "Some of your picks were filled in by auto-pick this week because they weren't submitted before the deadline."}</strong>
+    </p>`
+    : ''
+
   const content = `
     <h1 style="color:#ffffff;font-size:22px;font-weight:900;margin:0 0 8px;">
       All Picks Are In! 🏒
@@ -222,11 +232,12 @@ export function picksRevealEmail({
       Week ${weekNumber} picks have been locked and revealed.
       See what everyone picked for this weekend!
     </p>
+    ${autoPickNotice}
     <p style="color:#ccddee;font-size:15px;margin:0 0 24px;line-height:1.6;">
       Check the full picks grid to see the matchups, tiebreakers,
       and suicide pool selections for all players.
     </p>
-    ${button('View This Week\'s Picks →', `${APP_URL}/results/week?weekId=${weekId}`)}
+    ${button('View This Week\'s Picks →', `${APP_URL}/weekly-picks`)}
     <p style="color:#8899aa;font-size:13px;text-align:center;margin:0;">
       Good luck everyone! 🤞
     </p>

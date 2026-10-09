@@ -243,3 +243,28 @@ async function autoPickForPlayer(
     data:  { isDraft: false, submittedAt: new Date() },
   })
 }
+
+// ─────────────────────────────────────────────
+// For each player auto-pick touched this week: 'all' if it made every
+// pick (game and suicide), 'some' if it only filled in what was missing.
+export async function autoPickedPlayers(weekId: string): Promise<Map<string, 'all' | 'some'>> {
+  const [picks, suicide] = await Promise.all([
+    prisma.pick.findMany({ where: { weekId }, select: { userId: true, isAutoPickd: true } }),
+    prisma.suicidePick.findMany({ where: { weekId }, select: { userId: true, isAutoPicked: true } }),
+  ])
+  const counts = new Map<string, { total: number; auto: number }>()
+  for (const p of [
+    ...picks.map(p => ({ userId: p.userId, auto: p.isAutoPickd })),
+    ...suicide.map(p => ({ userId: p.userId, auto: p.isAutoPicked })),
+  ]) {
+    const c = counts.get(p.userId) ?? { total: 0, auto: 0 }
+    c.total++
+    if (p.auto) c.auto++
+    counts.set(p.userId, c)
+  }
+  const result = new Map<string, 'all' | 'some'>()
+  for (const [userId, c] of counts) {
+    if (c.auto > 0) result.set(userId, c.auto === c.total ? 'all' : 'some')
+  }
+  return result
+}

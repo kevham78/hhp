@@ -9,6 +9,7 @@ import {
   commissionerNudgeEmail,
 } from '@/lib/email/templates'
 import { z } from 'zod'
+import { autoPickedPlayers } from '@/lib/cron/autopick'
 
 const schema = z.object({
   type:   z.enum(['results', 'reminder', 'reveal', 'nudge']),
@@ -175,9 +176,10 @@ async function sendRevealEmail(weekId: string) {
     return NextResponse.json({ error: 'Week not found' }, { status: 404 })
   }
 
+  const autoPicked = await autoPickedPlayers(weekId)
   const players = await prisma.user.findMany({
     where: { isActive: true, notifyByEmail: true },
-    select: { email: true, name: true },
+    select: { id: true, email: true, name: true },
   })
 
   let sent = 0
@@ -189,7 +191,7 @@ async function sendRevealEmail(weekId: string) {
         subject: `🏒 HHP Week ${week.weekNumber} picks are in!`,
         html:    picksRevealEmail({
           weekNumber: week.weekNumber,
-          weekId,
+          autoPicked: autoPicked.get(player.id) ?? null,
         }),
       })
       sent++

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { runCommissionerNudge, runAutoApprove } from '@/lib/cron/scheduler'
-import { prisma, createSettings, createSeason, createUser, createPools, createWeek, publishWeekToNhl, sentEmails } from './db'
+import { runCommissionerNudge, runAutoApprove, runDeadlineJob } from '@/lib/cron/scheduler'
+import { prisma, createSettings, createSeason, createUser, createPools, createWeek, publishWeekToNhl, submitPicks, suicidePick, sentEmails } from './db'
 
 // Monday morning, after week 1's games (Sat Oct 3 / Sun Oct 4)
 const MONDAY_5AM = new Date('2026-10-05T09:00:00Z')
@@ -51,5 +51,31 @@ describe('Monday auto-approve', () => {
     await runAutoApprove()
 
     expect((await prisma.week.findUniqueOrThrow({ where: { id: week.id } })).status).toBe('COMPLETED')
+  })
+})
+
+describe('Friday deadline: auto-pick and the picks-are-in email', () => {
+  it('links to Weekly Picks and tells auto-picked players, in bold', async () => {
+    vi.setSystemTime(new Date('2026-10-02T18:00:00Z'))   // Fri 2pm EDT
+    const week = await createWeek({ seasonId: season.id, games: [{ home: 'TOR', away: 'MTL' }, { home: 'BOS', away: 'NYR' }] })
+    const done    = await createUser({ name: 'Done',    email: 'done@test.invalid',    seasonId: season.id })
+    const nothing = await createUser({ name: 'Nothing', email: 'nothing@test.invalid', seasonId: season.id })
+    const draft   = await createUser({ name: 'Draft',   email: 'draft@test.invalid',   seasonId: season.id })
+    await submitPicks(done.id, week, { TOR: 'TOR', BOS: 'NYR' }, { TOR: 1, BOS: 2 })
+    await suicidePick(done.id, week.id, 'WINNER', 'TOR')
+    await suicidePick(done.id, week.id, 'LOSER', 'BOS')
+    const tor = week.games.find(g => g.homeTeamCode === 'TOR')!
+    await prisma.pick.create({ data: { userId: draft.id, weekId: week.id, gameId: tor.id, pickedTeam: 'MTL', isDraft: true } })
+
+    await runDeadlineJob()
+
+    const emailTo = (to: string) => sentEmails().find(e => e.to === to) as any
+    for (const e of sentEmails() as any[]) {
+      expect(e.html).toContain('http://test.local/weekly-picks')
+      expect(e.html).not.toContain('/results/week')
+    }
+    expect(emailTo('done@test.invalid').html).not.toContain('auto-pick')
+    expect(emailTo('nothing@test.invalid').html).toMatch(/<strong>Your picks were made by auto-pick this week/)
+    expect(emailTo('draft@test.invalid').html).toMatch(/<strong>Some of your picks were filled in by auto-pick/)
   })
 })

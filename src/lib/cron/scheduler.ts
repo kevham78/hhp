@@ -1,7 +1,7 @@
 import cron, { type ScheduledTask } from 'node-cron'
 import { formatInTimeZone } from 'date-fns-tz'
 import { prisma } from '@/lib/db/prisma'
-import { runAutoPick } from './autopick'
+import { runAutoPick, autoPickedPlayers } from './autopick'
 import { confirmWeekResults } from '@/lib/db/results'
 import { sendEmail } from '@/lib/email/client'
 import {
@@ -147,7 +147,7 @@ async function sendReminders(isSecondReminder: boolean) {
 // Friday 2pm — auto-pick + reveal
 // ─────────────────────────────────────────────
 
-async function runDeadlineJob() {
+export async function runDeadlineJob() {
   console.log('[Cron] Running Friday deadline job')
 
   const week = await getActiveWeek()
@@ -163,10 +163,13 @@ async function runDeadlineJob() {
   // Run auto-picks for anyone who hasn't submitted
   await runAutoPick(week.id)
 
+  // Who did auto-pick fill in for? (all of their picks, or just gaps)
+  const autoPicked = await autoPickedPlayers(week.id)
+
   // Send picks reveal email to all players
   const players = await prisma.user.findMany({
     where: { isActive: true, notifyByEmail: true },
-    select: { email: true, name: true },
+    select: { id: true, email: true, name: true },
   })
 
   for (const player of players) {
@@ -177,7 +180,7 @@ async function runDeadlineJob() {
         subject: `🏒 HHP Week ${week.weekNumber} picks are in!`,
         html:    picksRevealEmail({
           weekNumber: week.weekNumber,
-          weekId:     week.id,
+          autoPicked: autoPicked.get(player.id) ?? null,
         }),
       })
     } catch (err) {
